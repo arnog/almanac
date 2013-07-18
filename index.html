@@ -1,0 +1,2097 @@
+<!DOCTYPE html>
+<html>
+	<head>
+<title>Almanac -- Phases of the moon, sunset and sunrise</title>
+<meta name="description" content="An almanac displaying the phases of the moon, the time of the sunrise and sunset">
+<meta name="keywords" content="sunrise, sunset, moon phases, almanac">
+
+
+<!-- iPhone -->
+<meta name = "viewport" content = "width = 600">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<style type="text/css">
+@font-face {
+    font-family: GraublauWeb;
+    font-weight: bold;
+    src: url("http://arno.org/fonts/GraublauWebBold.otf") format(truetype);
+}
+
+@font-face {
+	font-family: "Vegur";
+	font-weight: normal;
+	font-style: normal;
+	src: local("MyriadWebProRegular"), local("Myriad Web Pro"), url('http://arno.org/fonts/Vegur-R%200.601.otf') format("opentype");
+}
+
+body {
+	color: 			#666;
+	font-family: 	Vegur, "Trebuchet MS", Trebuchet, "Helvetica Neue", Helvetica, Arial, sans-serif;
+	line-height: 	1.1em;
+	background: 	repeat-x -webkit-gradient(linear, left top, left 400, from(#ccc), to(#fff));
+	background:		 -moz-linear-gradient(top, #ccc, white 400px);
+	margin: 		50px 0 0 0;
+}
+
+
+html>body {
+	text-align: 	left;
+	font-size: 		1em;
+}
+
+
+#almanac {
+	width:500px;
+	height:520px;
+	margin:auto;
+	background-color:#f9f9f9;
+	
+ 	background-image: url("img/red-banner.png");
+	background-repeat: repeat-x;
+
+/*	background:	repeat-x -webkit-gradient(linear, left 450, left bottom, from(#f9f9f9), to(#f4f4f4));
+	background:		-moz-linear-gradient(450, #f9f9f9, #f4f4f4 50px);
+*/
+	
+	padding:10px;
+
+	-webkit-border-radius: 20px;
+	-moz-border-radius: 20px;
+	border-radius: 20px;
+
+/*	border:1px solid #ccc; */
+	-webkit-box-shadow: -4px 0 6px rgba(0,0,0,.1), 4px 0 6px rgba(0,0,0,.1), 0 6px 6px rgba(0,0,0,.13);
+	-moz-box-shadow: -4px 0 6px rgba(0,0,0,.1), 4px 0 6px rgba(0,0,0,.1), 0 6px 6px rgba(0,0,0,.13);
+	box-shadow: -4px 0 6px rgba(0,0,0,.1), 4px 0 6px rgba(0,0,0,.1), 0 6px 6px rgba(0,0,0,.13);
+}
+
+#year {
+	width:500px;
+	height:25px;
+	text-align:center;
+	letter-spacing: 2px;
+	font-size:2.4em;
+	line-height:30px;
+	font-weight:bolder;
+	color:#fff;
+}
+
+#month {
+	position:absolute;
+	width:400px;
+	height:35px;
+	line-height:35px;
+	text-align:center;
+	font-size:1.4em;
+	font-weight:lighter;
+	text-transform:uppercase;
+	color:#fff;
+}
+
+#almanac button[type="button"]{
+	border:				none;
+	background: 		transparent;
+	font-size: 			3em;
+	color: 				#aaa;
+	height: 			50px;
+	width:				50px;
+	padding:			0;
+	margin:				-30px 0 0 0;
+}
+
+#almanac button[type="button"]:hover {
+	color: 				#000;
+}
+
+#almanac button[type="button"]:active {
+	color: 				#fff;
+}
+
+#location {
+	border-top: 1px solid #ddd;
+	width:	500px; 
+	height:	30px;
+	padding-top: 12px;
+	text-align: center;
+	font-size: .8em;
+	color: #999;
+	font-size: 9pt;
+}
+
+#location input {
+	border: 1px solid #ccc;
+	width: 480px;
+	height: 22px;
+	margin: -4px 0 0 0;
+	padding: 0 3px 0 3px;
+	
+	text-align: left;
+	font-size: 9pt;
+	color: #222;
+
+	outline: none;				/* suppress the focus ring */
+	-moz-outline: none;
+
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+
+	-webkit-box-shadow: inset 1px 1px 2px rgba(0,0,0,.06), inset 0 1px 2px rgba(0,0,0,.05), inset 1px 0 2px rgba(0,0,0,.05);
+}
+
+#calendar th {
+	font-size: 1.6em;
+	font-weight:lighter;
+	color: #bbb;
+	height: 1em;
+}
+
+#calendar td {
+	font-size: 1.8em;
+	color: #666;
+	letter-spacing: -2px;
+}
+
+.today {
+	color: #000 !important;
+	background-color: #eee;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+
+	padding: 1px;
+	border: 1px solid #ddd;
+
+	background: 	repeat-x -webkit-gradient(linear, left top, left 80, from(#f0f0f0), to(#ddd));
+	background:		-moz-linear-gradient(top, #f0f0f0, #ddd 80px);
+}
+
+.day_data {
+	font-size: .35em;
+	color: #aaa;
+	letter-spacing: 0;
+}
+
+.today .day_data {
+	color:#444;
+}
+
+@-webkit-keyframes 'show-autocomplete' {
+  from {
+    opacity: 0;
+    top: -20px;
+  }
+  to {
+    opacity: 1;
+    top: 1px;
+  }
+}
+
+
+
+.autocomplete {
+	position: relative;
+	background: white;
+	cursor: default;
+	overflow: auto;
+	overflow-x: hidden;
+	padding: 1px 0 3px 0;
+	margin: 1px;
+	border: 1px solid #aaa;
+
+	font-size: 9pt;
+
+	width: 479px;
+	left: 9px;
+	top: 1px;
+
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+
+	background-color: #f9f9f9;
+
+	-webkit-box-shadow: 0 8px 8px rgba(60,60,60,.2), -2px 0 8px rgba(60,60,60,.2), 2px 0 8px rgba(60,60,60,.2);
+	-moz-box-shadow: 0 8px 8px rgba(60,60,60,.2);
+	box-shadow: 0 8px 8px rgba(60,60,60,.2);
+
+	-webkit-animation-name: 'show-autocomplete';
+	-webkit-animation-duration: .3s;
+	-webkit-transition-timing-function: ease-in;
+}
+
+.autocomplete ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+.autocomplete hr {
+	border:none;
+	border-top: 1px solid #ccc;
+}
+
+.autocomplete ul li {
+	padding: 4px 4px 2px 14px;
+	margin: 0;
+	color: #444;
+	text-align: left;
+	border-top: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+}
+
+.autocomplete ul li.selected {
+	color: #fff;
+	background-color: #0066ce;
+	background: -webkit-gradient(linear, left top, left 20, from(#0066ce), to(#00419a));
+	border-top: 1px solid #00419a;
+	border-bottom: 1px solid #00419a;
+}
+
+</style>
+
+<script type="text/javascript">//<![CDATA[
+
+g_location_modified_by_user = false;
+g_geolocation_available = false;
+
+// See also http://www.geonames.org/
+
+var cities = 	[
+["&Iacute;safj&ouml;r&eth;ur, Iceland", 66, 4, -23, 7, "isafjordur iceland"],
+["Aarhus, Denmark", 56, 9, 10, 12, "aarhus denmark"],
+["Aberdeen, Scotland, Great Britain", 57, 15, -2, 11, "aberdeen scotland great britain"],
+["Abidjan, CÃ´te d'Ivoire", 5, 20, -4, 1, "abidjan cote d'ivoire"],
+["Abu Dhabi, United Arab Emirates", 24, 28, 54, 22, "abu dhabi united arab emirates"],
+["Abuja, Nigeria", 9, 4, 7, 29, "abuja nigeria"],
+["Acapulco, Guerrero, Mexico", 16, 50, -99, 55, "acapulco guerrero mexico"],
+["Accra, Ghana", 5, 30, -0, 10, "accra ghana"],
+["Adak, Alaska, USA", 51, 53, -176, 38, "adak alaska usa"],
+["Adamstown, Pitcairn Islands, Great Britain", -25, 4, -130, 6, "adamstown pitcairn islands great britain"],
+["Adana, Turkey", 37, 48, 35, 57, "adana turkey"],
+["Addis Ababa, Ethiopia", 9, 1, 38, 44, "addis ababa ethiopia"],
+["Adelaide, South Australia, Australia", -34, 55, 138, 36, "adelaide south australia australia"],
+["Agartala, Tripura, India", 23, 30, 91, 12, "agartala tripura india"],
+["Agra, Uttar Pradesh, India", 27, 10, 78, 1, "agra uttar pradesh india"],
+["Aguascalientes, Mexico", 21, 51, -102, 18, "aguascalientes mexico"],
+["Ahmedabad, Gujarat, India ", 23, 1, 72, 34, "ahmedabad gujarat india "],
+["Akureyri, Iceland", 65, 41, -18, 6, "akureyri iceland"],
+["Albuquerque, New Mexico, USA", 35, 6, -106, 36, "albuquerque new mexico usa"],
+["Alert, Nunavut Nunavut, Canada", 82, 28, -62, 30, "alert nunavut nunavut canada"],
+["Alexandria, Egypt", 31, 12, 29, 55, "alexandria egypt"],
+["Algiers, Algeria", 36, 42, 3, 13, "algiers algeria"],
+["Almaty, Kazakhstan", 43, 16, 76, 53, "almaty kazakhstan"],
+["Alofi, Niue", -19, 3, -169, 55, "alofi niue"],
+["Alor Star, Kedah, Malaysia", 6, 7, 100, 22, "alor star kedah malaysia"],
+["Ambon, Maluku, Indonesia", -3, 42, 128, 10, "ambon maluku indonesia"],
+["Amman, Jordania", 31, 57, 35, 56, "amman jordania"],
+["Amritsar, Punjab, India", 31, 38, 74, 51, "amritsar punjab india"],
+["Amsterdam, Netherlands", 52, 22, 4, 53, "amsterdam netherlands"],
+["Amundsen-Scott South Pole Station", -90, 0, -139, 16, "amundsen-scott south pole station"],
+["Anadyr, Russia", 64, 44, 177, 30, "anadyr russia"],
+["Anaheim, California, USA", 33, 50, -117, 53, "anaheim california usa"],
+["Anchorage, Alaska, USA", 61, 13, -149, 53, "anchorage alaska usa"],
+["Andorra la Vella, Andorra", 42, 30, 1, 30, "andorra la vella andorra"],
+["Ankara, Turkey", 39, 52, 32, 50, "ankara turkey"],
+["Antananarivo, Madagascar", -18, 55, 47, 31, "antananarivo madagascar"],
+["Antofagasta, Chile", -23, 38, -70, 23, "antofagasta chile"],
+["Antwerp, Belgium", 51, 13, 4, 24, "antwerp belgium"],
+["Apia, Samoa", -13, 50, -171, 50, "apia samoa"],
+["Aracaju, Sergipe, Brazil", -10, 54, -37, 2, "aracaju sergipe brazil"],
+["Arbil, Iraqi Kurdistan, Iraq", 36, 20, 44, 1, "arbil iraqi kurdistan iraq"],
+["Arequipa, Peru", -16, 24, -71, 32, "arequipa peru"],
+["Arica, Chile", -18, 28, -70, 18, "arica chile"],
+["Arkhangelsk, Russia", 64, 32, 40, 32, "arkhangelsk russia"],
+["Ashgabat, Turkmenistan", 37, 58, 58, 20, "ashgabat turkmenistan"],
+["Asmara, Eritrea", 15, 20, 38, 56, "asmara eritrea"],
+["Assis, SÃ£o Paulo, Brazil", -22, 39, -50, 24, "assis sao paulo brazil"],
+["Astana, Kazakhstan", 51, 11, 71, 27, "astana kazakhstan"],
+["Asunci&oacute;n, Paraguay", -25, 16, -57, 40, "asuncion paraguay"],
+["Athens, Greece", 37, 58, 23, 43, "athens greece"],
+["Atlanta, Georgia, USA", 33, 45, -84, 23, "atlanta georgia usa"],
+["Auckland, New-Zealand", -36, 51, 174, 47, "auckland new-zealand"],
+["Augusta, Maine, USA", 44, 18, -69, 46, "augusta maine usa"],
+["Austin, Texas, USA", 30, 16, -97, 46, "austin texas usa"],
+["Avarua, Cook Islands, New-Zealand", -21, 12, -159, 46, "avarua cook islands new-zealand"],
+["Ayacucho, Peru", -13, 9, -74, 13, "ayacucho peru"],
+["Ayutthaya (city), Thailand", 14, 20, 100, 34, "ayutthaya (city) thailand"],
+["Baghdad, Iraq", 33, 20, 44, 26, "baghdad iraq"],
+["BahÃ­a Blanca, Buenos Aires Province, Argentina", -38, 43, -62, 16, "bahia blanca buenos aires province argentina"],
+["Bakersfield, California, USA", 35, 22, -119, 1, "bakersfield california usa"],
+["Baku, Azerbaijan", 40, 22, 49, 53, "baku azerbaijan"],
+["Balikpapan, Indonesia", -1, 15, 116, 49, "balikpapan indonesia"],
+["Baltimore, Maryland, USA", 39, 17, -76, 37, "baltimore maryland usa"],
+["Bamako, Mali", 12, 39, -8, 0, "bamako mali"],
+["Banda Aceh, Indonesia", 5, 31, 95, 25, "banda aceh indonesia"],
+["Bandar Seri Begawan, Brunei", 4, 53, 114, 56, "bandar seri begawan brunei"],
+["Bandung, Indonesia", -6, 57, 107, 34, "bandung indonesia"],
+["Bangalore, Karnataka, India", 12, 58, 77, 35, "bangalore bengaluru karnataka india"],
+["Bangkok, Thailand", 13, 45, 100, 31, "bangkok thailand"],
+["Bangui, Central African Republic", 4, 22, 18, 35, "bangui central african republic"],
+["Banjul, The Gambia", 13, 27, 16, 34, "banjul the gambia"],
+["Barcelona, Catalonia, Spain", 41, 23, 2, 11, "barcelona catalonia spain"],
+["Barrow, Alaska, Alaska, USA", 71, 18, -156, 45, "barrow alaska alaska usa"],
+["Basel, Switzerland", 47, 34, 7, 36, "basel switzerland"],
+["Basra, Iraq", 30, 30, 47, 49, "basra iraq"],
+["Basse-Terre, Guadeloupe, France", 15, 59, -61, 43, "basse-terre guadeloupe france"],
+["Basseterre, Saint Kitts and Nevis", 17, 18, -62, 44, "basseterre saint kitts and nevis"],
+["Bath, Somerset, England, Great Britain", 51, 38, -2, 36, "bath somerset england great britain"],
+["Batticaloa, Sri Lanka", 7, 43, 81, 42, "batticaloa sri lanka"],
+["Beijing, China", 39, 54, 116, 23, "beijing peking china"],
+["Beirut, Lebanon", 33, 53, 35, 31, "beirut lebanon"],
+["BelÃ©m, ParÃ¡, Brazil", -1, 28, -48, 29, "belem para brazil"],
+["Belfast, Northern Ireland, Great Britain", 54, 36, -5, 56, "belfast northern ireland great britain"],
+["Belgrade, Serbia", 44, 49, 20, 27, "belgrade serbia"],
+["Belize City, Belize", 17, 29, -88, 11, "belize city belize"],
+["Belmopan, Belize", 17, 15, -88, 46, "belmopan belize"],
+["Belo Horizonte, Minas Gerais, Brazil", -19, 55, -43, 56, "belo horizonte minas gerais brazil"],
+["Benghazi, Libya", 32, 7, 20, 4, "benghazi libya"],
+["Benin City, Nigeria", 6, 19, 5, 36, "benin city nigeria"],
+["Bergen, Norway", 60, 22, 5, 24, "bergen norway"],
+["Berkeley, California, USA", 37, 52, -122, 16, "berkeley california usa"],
+["Berlin, Germany", 52, 31, 13, 25, "berlin germany"],
+["Bern, Switzerland", 46, 57, 7, 27, "bern switzerland"],
+["Bhisho, Eastern Cape, South Africa", -32, 53, 27, 23, "bhisho eastern cape south africa"],
+["Bilbao, Basque Country, Spain", 43, 15, -2, 55, "bilbao basque country spain"],
+["Birkirkara, Malta", 35, 53, 14, 27, "birkirkara malta"],
+["Birmingham, Alabama, USA", 33, 31, -86, 49, "birmingham alabama usa"],
+["Birmingham, England, Great Britain", 52, 29, -1, 54, "birmingham england great britain"],
+["Bishkek, Kyrgyzstan", 42, 52, 74, 36, "bishkek kyrgyzstan"],
+["Bismarck, North Dakota, USA", 46, 48, -100, 46, "bismarck north dakota usa"],
+["Bissau, Guinea-Bissau ", 11, 51, -15, 34, "bissau guinea-bissau "],
+["Blantyre, Malawi", -15, 47, 35, 0, "blantyre malawi"],
+["Bloemfontein, Free State, South Africa", -29, 6, 26, 13, "bloemfontein free state south africa"],
+["Boa Vista, Roraima, Brazil", 2, 49, -60, 40, "boa vista roraima brazil"],
+["Bobo-Dioulasso, Burkina Faso", 11, 11, -4, 17, "bobo-dioulasso burkina faso"],
+["Boden, Sweden", 65, 50, 21, 43, "boden sweden"],
+["Bod&oslash;, Norway", 67, 18, 14, 33, "bodo norway"],
+["Bogor, Indonesia", -6, 36, 106, 48, "bogor indonesia"],
+["Bogot&aacute;, Colombia", 4, 37, -74, 5, "bogota colombia"],
+["Boise, Idaho, USA", 43, 36, -116, 12, "boise idaho usa"],
+["Bordeaux, France", 44, 50, -0, 35, "bordeaux france"],
+["Boston, Massachusetts, USA", 42, 21, -71, 4, "boston massachusetts usa"],
+["Bras&iacute;lia, Brazil", -15, 48, -47, 54, "brasilia brazil"],
+["Bratislava, Slovakia", 48, 9, 17, 7, "bratislava slovakia"],
+["Bratsk, Russia", 56, 10, 101, 37, "bratsk russia"],
+["Brazzaville, Republic of the Congo", -4, 16, -15, 17, "brazzaville republic of the congo"],
+["Bremen, Germany", 53, 4, 8, 49, "bremen germany"],
+["Bridgetown, Barbados", 13, 5, -59, 37, "bridgetown barbados"],
+["Brighton and Hove, England, Great Britain", 50, 49, -0, 9, "brighton and hove england great britain"],
+["Brisbane, Queensland, Australia", -27, 28, 153, 1, "brisbane queensland australia"],
+["Bristol, England, Great Britain", 51, 27, -2, 36, "bristol england great britain"],
+["Brussels, Belgium", 50, 50, 4, 21, "brussels belgium"],
+["Bucharest, Romania", 44, 26, 26, 6, "bucharest romania"],
+["Budapest, Hungary", 47, 28, 19, 3, "budapest hungary"],
+["Buenos Aires, Argentina", -34, 40, -58, 24, "buenos aires argentina"],
+["Buffalo, New York, New York, USA", 42, 54, -78, 51, "buffalo new york new york usa"],
+["Bujumbura, Burundi", -3, 23, 29, 22, "bujumbura burundi"],
+["Bulawayo, Zimbabwe", -20, 10, 28, 34, "bulawayo zimbabwe"],
+["Bursa, Turkey", 40, 20, 29, 8, "bursa turkey"],
+["Busan, South Korea ", 35, 6, 129, 2, "busan pusan south korea "],
+["C&uacute;cuta, North Santander, Colombia", 7, 53, -72, 30, "cucuta colombia"],
+["Cagliari, Italy", 39, 14, 9, 7, "cagliari italy"],
+["Cairns, Queensland, Australia", -16, 55, 145, 46, "cairns queensland australia"],
+["Cairo, Egypt", 30, 3, 31, 13, "cairo egypt"],
+["Calama, Chile", -22, 27, -68, 56, "calama chile"],
+["Calgary, Alberta, Canada", 51, 2, -114, 3, "calgary alberta canada"],
+["Cambridge, England, Great Britain", 52, 12, 0, 7, "cambridge england great britain"],
+["Campinas, SÃ£o Paulo, Brazil", -22, 54, -47, 3, "campinas sao paulo brazil"],
+["Campo Grande, Mato Grosso do Sul, Brazil", -20, 26, -54, 38, "campo grande mato grosso do sul brazil"],
+["Canberra, Australian Capital Territory, Australia", -35, 18, 149, 7, "canberra australian capital territory australia"],
+["Canc&uacute;n, Quintana Roo, Mexico", 21, 10, -86, 50, "cancun quintana roo mexico"],
+["Cannes, Provence-Alpes-CÃ´te d'Azur, France", 43, 33, 7, 0, "cannes provence-alpes-cote d'azur france"],
+["Cape Town, Western Cape, South-Africa", -33, 55, 18, 25, "cape town western cape south-africa"],
+["Caracas, Venezuela", 10, 30, -66, 55, "caracas venezuela"],
+["Cardiff, Wales, Great Britain", 51, 29, -3, 11, "cardiff wales great britain"],
+["Casablanca, Morocco", 33, 32, -7, 35, "casablanca morocco"],
+["Castries, Saint Lucia", 14, 1, -60, 59, "castries saint lucia"],
+["Catania, Italy", 37, 30, 15, 5, "catania italy"],
+["Cayenne, French Guiana, France", 4, 56, -52, 20, "cayenne french guiana france"],
+["Cebu City, Philippines", 10, 17, 123, 54, "cebu city philippines"],
+["Chaguanas, Trinidad and Tobago", 10, 30, -61, 23, "chaguanas trinidad and tobago"],
+["Chalcis, Greece", 38, 28, 23, 36, "chalcis greece"],
+["Changchun, Jilin, China", 43, 53, 125, 19, "changchun jilin china"],
+["Charleston, West Virginia, USA", 38, 20, -81, 38, "charleston west virginia usa"],
+["Charlotte Amalie, United States Virgin Islands, USA", -18, 21, -64, 57, "charlotte amalie united states virgin islands usa"],
+["Charlotte, North Carolina, USA", 35, 14, -80, 50, "charlotte north carolina usa"],
+["Charlottetown, Prince Edward Island, Canada", 46, 14, -63, 8, "charlottetown prince edward island canada"],
+["Chelyabinsk, Russia", 55, 9, 61, 22, "chelyabinsk russia"],
+["Chengdu, Sichuan, China", 30, 39, 104, 4, "chengdu sichuan china"],
+["Chennai, Tamil Nadu, India", 13, 5, 80, 16, "chennai madras tamil nadu india"],
+["Cheyenne, Wyoming, Wyoming, USA", 41, 8, -104, 48, "cheyenne wyoming wyoming usa"],
+["Chi&#x15F;in&#x103;u, Moldova", 47, 0, 28, 55, "chisinau moldova"],
+["Chiang Mai, Thailand", 18, 47, 98, 59, "chiang mai thailand"],
+["Chicago, Illinois, USA", 41, 52, -87, 37, "chicago illinois usa"],
+["Chihuahua, Chihuahua, Mexico", 28, 6, -106, 0, "chihuahua chihuahua mexico"],
+["Chinandega, Nicaragua", 12, 37, -87, 9, "chinandega nicaragua"],
+["Chittagong, Bangladesh", 22, 22, 91, 48, "chittagong bangladesh"],
+["Chongjin, North Korea", 41, 48, 129, 47, "chongjin north korea"],
+["Chongqing, China", 29, 33, 106, 30, "chongqing china"],
+["Christchurch, New-Zealand", -43, 32, 172, 37, "christchurch new-zealand"],
+["Chu&iacute;, Rio Grande do Sul, Brazil", -33, 41, -53, 27, "chui rio grande do sul brazil"],
+["Chula Vista, California, USA", 32, 37, -117, 3, "chula vista california usa"],
+["Cincinnati, Ohio, USA", 39, 8, -84, 30, "cincinnati ohio usa"],
+["City of Halifax, Nova Scotia, Canada", 44, 40, -63, 36, "city of halifax nova scotia canada"],
+["City of San Marino, San Marino", 43, 56, 12, 26, "city of san marino san marino"],
+["Ciudad Bol&iacute;var, Venezuela", 8, 12, -63, 55, "ciudad bolivar venezuela"],
+["Ciudad del Este, Paraguay", -25, 25, -54, 37, "ciudad del este paraguay"],
+["Ciudad Ju&aacute;rez, Chihuahua, Mexico", 31, 48, -106, 98, "ciudad juarez chihuahua mexico"],
+["Cleveland, Ohio, USA", 41, 29, -81, 40, "cleveland ohio usa"],
+["Cockburn Town, Turks and Caicos Islands, Great Britain", 21, 27, -71, 8, "cockburn town turks and caicos islands great britain"],
+["Coihaique, Chile", -45, 34, -72, 4, "coihaique chile"],
+["Cologne, North Rhine-Westphalia, Germany", 50, 57, 6, 58, "cologne north rhine-westphalia germany"],
+["Colombo, Sri Lanka", 6, 53, 79, 52, "colombo sri lanka"],
+["Columbia, South Carolina, USA", 34, 0, -81, 2, "columbia south carolina usa"],
+["Columbus, Ohio, USA", 39, 59, -82, 59, "columbus ohio usa"],
+["Comodoro Rivadavia, Chubut, Argentina", -45, 52, -67, 29, "comodoro rivadavia chubut argentina"],
+["Conakry, Guinea", 9, 30, -13, 42, "conakry guinea"],
+["Concepci&oacute;n, Chile", -36, 50, -73, 3, "concepcion chile"],
+["Concord, New Hampshire, USA", 43, 12, 71, 32, "concord new hampshire usa"],
+["Copenhagen, Denmark", 55, 43, 12, 34, "copenhagen denmark"],
+["Copiap&oacute;, Chile", -27, 22, -70, 20, "copiapo chile"],
+["C&oacute;rdoba, Argentina", -31, 24, -64, 11, "cordoba argentina"],
+["Cork, Ireland", 51, 53, -8, 28, "cork ireland"],
+["Cotonou Benin", 6, 22, 2, 25, "cotonou benin"],
+["Coventry, England, Great Britain", 52, 24, -1, 30, "coventry england great britain"],
+["Cuiab&aacute;, Mato Grosso, Brazil", -15, 36, -56, 5, "cuiaba mato grosso brazil"],
+["Culiac&aacute;n, Sinaloa, Mexico", 25, 14, -107, 50, "culiacan sinaloa mexico"],
+["Cupertino, California, USA", 37, 19, -122, 2, "cupertino california usa"],
+["Curitiba, ParanÃ¡, Brazil", -25, 25, -49, 17, "curitiba parana brazil"],
+["D&uuml;sseldorf, North Rhine-Westphalia, Germany", 51, 14, 6, 47, "dusseldorf north rhine-westphalia germany"],
+["Da Nang, Vietnam", 16, 4, 108, 14, "da nang vietnam"],
+["Daegu, South Korea", 35, 52, 128, 36, "daegu taegu south korea"],
+["Dakar, Senegal", 14, 40, -17, 25, "dakar senegal"],
+["Dalian, Liaoning, China", 39, 2, 121, 46, "dalian liaoning china"],
+["Dallas, Texas, USA", 32, 46, -96, 48, "dallas texas usa"],
+["Damascus, Syria", 33, 30, 36, 17, "damascus syria"],
+["Dammam, Saudi Arabia", 26, 26, 50, 7, "dammam saudi arabia"],
+["Dar es Salaam, Tanzania", -6, 48, 39, 17, "dar es salaam tanzania"],
+["Darwin, Northern Territory, Australia", -12, 27, 130, 50, "darwin northern territory palmerston australia"],
+["Davao City, Philippines", 7, 30, 126, 0, "davao city philippines"],
+["Deadhorse, Alaska, USA", 70, 12, -148, 30, "deadhorse alaska usa"],
+["Dededo, Guam, USA", 13, 31, 144, 50, "dededo guam usa"],
+["Denpasar, Bali, Indonesia", -8, 39, 115, 13, "denpasar bali indonesia"],
+["Denver, Colorado, USA", 39, 45, -104, 59, "denver colorado usa"],
+["Des Moines, Iowa, USA", 41, 35, -93, 37, "des moines iowa usa"],
+["Detroit, Michigan, USA", 42, 20, -83, 3, "detroit michigan usa"],
+["Dhaka, Bangladesh", 23, 42, 90, 23, "dhaka dacca bangladesh"],
+["Dibrugarh, Assam, India", 27, 29, 94, 55, "dibrugarh assam india"],
+["Dili, East Timor", -8, 33, 125, 35, "dili east timor"],
+["Djibouti, Djibouti", 11, 36, 43, 10, "djibouti djibouti"],
+["Dodoma, Tanzania", -6, 10, 35, 44, "dodoma tanzania"],
+["Doha, Qatar", 25, 17, 51, 32, "doha qatar"],
+["Dongguan, Guangdong, China", 23, 2, 113, 43, "dongguan guangdong china"],
+["Douala, Cameroon", 4, 3, 9, 42, "douala cameroon"],
+["Douglas, Isle of Man, Great Britain", 54, 8, -4, 29, "douglas isle of man great britain"],
+["Dover, Delaware, USA", 39, 9, -75, 31, "dover delaware usa"],
+["Dresden, Saxony, Germany", 51, 3, 13, 44, "dresden saxony germany"],
+["Dubai, United Arab Emirates", 25, 16, 55, 18, "dubai united arab emirates"],
+["Dublin, Ireland", 53, 21, -6, 16, "dublin ireland"],
+["Dunedin, New-Zealand", -45, 52, 170, 30, "dunedin new-zealand"],
+["Durango, Mexico", 24, 1, -104, 40, "durango mexico"],
+["Durban, KwaZulu-Natal, South Africa", -29, 53, 31, 3, "durban kwazulu-natal south africa"],
+["Dushanbe, Tajikistan", 38, 32, 68, 46, "dushanbe tajikistan"],
+["Dusseldorf, North Rhine-Westphalia, Germany", 51, 14, 6, 47, "dusseldorf north rhine-westphalia germany"],
+["Edinburgh, Scotland, Great Britain", 55, 57, -3, 12, "edinburgh scotland great britain"],
+["Edmonton, Alberta, Canada", 53, 34, -113, 31, "edmonton alberta canada"],
+["Eilat, Israel", 29, 33, 34, 57, "eilat israel"],
+["El Aai&uacute;n, Western Sahara, Morocco", 27, 9, -13, 12, "el aaiun western sahara morocco"],
+["El Paso, Texas, USA", 31, 47, -106, 25, "el paso texas usa"],
+["Enschede, Netherlands", 52, 13, 6, 53, "enschede netherlands"],
+["Ensenada, Baja California, Mexico ", 31, 47, -116, 36, "ensenada baja california mexico "],
+["Entebbe, Uganda", 0, 4, 32, 27, "entebbe uganda"],
+["Enugu, Nigeria", 6, 27, 7, 30, "enugu nigeria"],
+["Espoo, Finland", 60, 12, 24, 39, "espoo finland"],
+["Essen, North Rhine-Westphalia, Germany", 51, 27, 7, 0, "essen north rhine-westphalia germany"],
+["Exeter, England, Great Britain", 50, 43, -3, 32, "exeter england great britain"],
+["Fairbanks, Alaska, USA", 64, 50, -147, 42, "fairbanks alaska usa"],
+["Faisalabad, Punjab, Pakistan", 31, 22, 72, 59, "faisalabad punjab pakistan"],
+["Florence, Italy", 43, 46, 11, 15, "florence italy"],
+["FlorianÃ³polis, Santa Catarina, Brazil", -27, 25, -48, 32, "florianopolis santa catarina brazil"],
+["Fort McMurray, Alberta, Canada", 56, 44, -111, 23, "fort mcmurray alberta canada"],
+["Fort-de-France, Martinique, France", 14, 36, -61, 5, "fort-de-france martinique france"],
+["Fortaleza, CearÃ¡, Brazil", -3, 46, -38, 34, "fortaleza ceara brazil"],
+["Francistown, Botswana", -21, 10, 27, 30, "francistown botswana"],
+["Frankfurt, Hesse, Germany", 50, 6, 8, 41, "frankfurt hesse germany"],
+["Fredericton, New Brunswick, Canada", 45, 57, -66, 40, "fredericton new brunswick canada"],
+["Freetown, Sierra Leone", 8, 30, -13, 7, "freetown sierra leone"],
+["Fresno, California, USA", 36, 44, -119, 46, "fresno california usa"],
+["Fukuoka, Japan", 33, 35, 130, 24, "fukuoka japan"],
+["Funafuti, Tuvalu", -8, 31, 179, 13, "funafuti tuvalu"],
+["Furnace Creek, California, USA", 36, 27, -116, 52, "furnace creek california usa"],
+["G&auml;llivare-Malmberget-Koskullskulle, Sweden", 67, 7, 20, 45, "gallivare-malmberget-koskullskulle sweden"],
+["Gaborone, Botswana", -24, 39, 25, 54, "gaborone botswana"],
+["Gangtok, Sikkim, India", 27, 19, 88, 37, "gangtok sikkim india"],
+["Gaza, Gaza Strip, Palestine", 31, 31, 34, 27, "gaza gaza strip palestine"],
+["Gaziantep, Turkey", 37, 4, 37, 23, "gaziantep turkey"],
+["Gda&#x144;sk, Poland", 54, 21, 18, 40, "gdansk poland"],
+["Gdynia, Poland", 54, 30, 18, 32, "gdynia poland"],
+["Geelong, Victoria , Australia", -38, 9, 144, 21, "geelong victoria australia"],
+["Geneva, Switzerland", 46, 12, 6, 9, "geneva switzerland"],
+["George Town, Cayman Islands", 19, 18, -81, 22, "george town cayman islands"],
+["George Town, Penang, Malaysia", 5, 25, 100, 19, "george town penang malaysia"],
+["Georgetown, Guyana", 6, 48, -58, 10, "georgetown guyana"],
+["Gibraltar, Gibraltar", 36, 8, -5, 21, "gibraltar gibraltar"],
+["Glasgow, Scotland, Great Britain", 55, 52, -4, 15, "glasgow scotland great britain"],
+["Gloucester, England, Great Britain", 51, 87, -2, 24, "gloucester england great britain"],
+["Goi&acirc;nia, Goi&aacute;s, Brazil", -16, 41, -49, 15, "goiania goias brazil"],
+["Gold Coast, Queensland, Australia", -28, 0, 153, 25, "gold coast queensland australia"],
+["Gothenburg, Sweden", 57, 42, 11, 55, "gothenburg sweden"],
+["Grand Canyon National Park, Arizona, USA", 36, 6, -112, 6, "grand canyon national park arizona usa"],
+["Grande Prairie, Alberta, Canada", 55, 10, -118, 48, "grande prairie alberta canada"],
+["Graz, Austria", 47, 4, 15, 26, "graz austria"],
+["Great Smoky Mountains National Park, Tennessee and North Carolina, USA ", 35, 41, -83, 32, "great smoky mountains national park tennessee and north carolina usa "],
+["Greater Sudbury, Ontario, Canada", 46, 37, -80, 48, "greater sudbury ontario canada"],
+["Greenwich, England, Great Britain", 51, 28, -0, 0, "greenwich england great britain"],
+["Grenoble, France", 45, 12, 5, 32, "grenoble france"],
+["Groningen, Netherlands", 53, 13, 6, 34, "groningen netherlands"],
+["Grytviken, Great Britain", -54, 17, -36, 31, "grytviken great britain"],
+["Guadalajara, Jalisco, Mexico", 20, 40, -103, 21, "guadalajara jalisco mexico"],
+["Guangzhou, Guangdong, China", 23, 6, 113, 16, "guangzhou canton guangdong china"],
+["Guatemala City, Guatemala", 14, 38, -90, 33, "guatemala city guatemala"],
+["Guayaquil, Ecuador", -2, 11, -79, 53, "guayaquil ecuador"],
+["Guwahati, Assam, India", 26, 10, 91, 45, "guwahati assam india"],
+["Haarlem, Netherlands", 52, 22, 4, 38, "haarlem netherlands"],
+["Hag&aring;t&ntilde;a, Guam, USA", 13, 29, 144, 45, "hagatna agana guam usa"],
+["Hai Phong, Vietnam", 20, 51, 106, 41, "hai phong vietnam"],
+["Halkida, Greece", 38, 28, 23, 36, "halkida chalcis chalkida greece"],
+["Hamburg, Germany", 53, 34, 10, 2, "hamburg germany"],
+["Hamilton, Bermuda", 32, 18, -64, 47, "hamilton bermuda"],
+["Hamilton, New-Zealand", -37, 47, 175, 17, "hamilton new-zealand"],
+["Hammerfest, Norway", 70, 39, 23, 41, "hammerfest norway"],
+["Handan, Hubei, China", 36, 36, 114, 29, "handan hubei china"],
+["Hanga Roa, Easter Island, Chile", 27, 9, -109, 26, "hanga roa easter island chile"],
+["Hangzhou, Zhejiang, China", 30, 15, 120, 10, "hangzhou zhejiang china"],
+["Hanoi, Vietnam", 21, 2, 105, 51, "hanoi vietnam"],
+["Hanover, Lower Saxony, Germany", 52, 22, 9, 43, "hanover lower saxony germany"],
+["Haparanda, Sweden", 65, 50, 24, 8, "haparanda sweden"],
+["Harare, Zimbabwe", -17, 52, 31, 2, "harare zimbabwe"],
+["Harbin, Heilongjiang, China", 45, 45, 126, 38, "harbin heilongjiang china"],
+["Hargeisa, Somaliland, Somalia", 9, 30, 44, 0, "hargeisa somaliland somalia"],
+["Hartford, Connecticut, USA", 41, 45, -72, 41, "hartford connecticut usa"],
+["Hat Yai, Thailand", 7, 1, 100, 28, "hat yai thailand"],
+["Havana, Cuba", 23, 7, -82, 23, "havana cuba"],
+["Helena, Montana, USA", 46, 35, -112, 1, "helena montana usa"],
+["Helsinki, Finland", 60, 10, 24, 56, "helsinki finland"],
+["Hermosillo, Sonora, Mexico ", 29, 55, -110, 57, "hermosillo sonora mexico "],
+["Hilo, Hawaii, USA", 19, 42, -155, 6, "hilo hawaii usa"],
+["Hiroshima, Japan", 34, 23, 132, 27, "hiroshima japan"],
+["Ho Chi Minh City, Vietnam", 10, 46, 106, 41, "ho chi minh city vietnam"],
+["Hobart, Tasmania, Australia", -42, 53, 147, 19, "hobart tasmania australia"],
+["Hong-Kong, China", 22, 18, 114, 12, "hong-kong hong kong china"],
+["Honiara, Solomon Islands", -9, 28, 159, 49, "honiara solomon islands"],
+["Honolulu, Hawaii, USA", 21, 18, -157, 50, "honolulu hawaii usa"],
+["Horta, Azores, Portugal", 38, 32, -28, 38, "horta azores portugal"],
+["Houston, Texas, USA", 29, 45, -95, 22, "houston texas usa"],
+["Hu&#x1EBF;, Vietnam", 16, 28, 107, 36, "hue vietnam"],
+["Huambo, Angola", -12, 46, 15, 44, "huambo angola"],
+["Hyderabad, Andhra Pradesh, India", 17, 22, 78, 28, "hyderabad andhra pradesh india"],
+["Hyderabad, Sindh, Pakistan", 25, 22, 68, 22, "hyderabad sindh pakistan"],
+["Ibadan, Oyo, Nigeria", 7, 22, 3, 53, "ibadan oyo nigeria"],
+["IlhÃ©us, Bahia, Brazil", -14, 47, -39, 2, "ilheus bahia brazil"],
+["Iloilo City, Philippines", 10, 41, 122, 33, "iloilo city philippines"],
+["Imperatriz, Maranh&atilde;o, Brazil", -5, 32, 47, 29, "imperatriz maranhao brazil"],
+["Incheon, South Korea", 37, 29, 126, 38, "incheon south korea"],
+["Indianapolis, Indiana, USA", 39, 46, -86, 9, "indianapolis indiana usa"],
+["Innsbruck, Austria", 47, 16, 11, 23, "innsbruck austria"],
+["Invercargill, New-Zealand", -46, 25, 168, 18, "invercargill new-zealand"],
+["Inverness, Scotland, Great Britain", 57, 47, -4, 23, "inverness scotland great britain"],
+["Ipoh, Perak, Malaysia", 4, 60, 101, 7, "ipoh perak malaysia"],
+["Iqaluit, Nunavut, Canada ", 63, 45, -68, 31, "iqaluit nunavut canada "],
+["Iquique, Chile", -20, 13, -70, 9, "iquique chile"],
+["Iquitos, Peru", -3, 44, -73, 15, "iquitos peru"],
+["Irkutsk, Russia", 52, 17, 104, 16, "irkutsk russia"],
+["Isfahan (city), Iran", 32, 38, 51, 29, "isfahan (city) iran"],
+["Islamabad, Pakistan", 33, 43, 73, 4, "islamabad pakistan"],
+["Istanbul, Turkey", 41, 0, 28, 58, "istanbul turkey"],
+["Izhevsk, Russia", 56, 50, 53, 11, "izhevsk russia"],
+["Ä°zmir, Turkey", 38, 26, 27, 9, "iÌ‡zmir turkey"],
+["Jackson, Mississippi, USA", 32, 17, -90, 11, "jackson mississippi usa"],
+["Jacksonville, Florida, USA", 30, 19, -81, 40, "jacksonville florida usa"],
+["Jaipur, Rajasthan, India", 26, 55, 75, 49, "jaipur rajasthan india"],
+["Jakarta, Indonesia", -6, 8, 106, 45, "jakarta indonesia"],
+["Jayapura, Indonesia", -2, 32, 140, 43, "jayapura indonesia"],
+["Jeddah, Saudi Arabia", 21, 32, 39, 10, "jeddah saudi arabia"],
+["Jersey City, New Jersey, USA", 41, 26, -74, 8, "jersey city new jersey usa"],
+["Jerusalem, Israel", 31, 46, 35, 14, "jerusalem israel"],
+["Jinan, Shandong, China", 36, 40, 116, 59, "jinan shandong china"],
+["Jo&atilde;o Pessoa, Para&iacute;ba, Brazil", -7, 7, -34, 51, "joao pessoa paraiba brazil"],
+["Johannesburg, Gauteng, South Africa", -26, 12, 28, 2, "johannesburg gauteng south africa"],
+["Johor Bahru, Johor, Malaysia", 1, 29, 103, 44, "johor bahru johor malaysia"],
+["Juneau, Alaska, USA", 58, 23, -134, 11, "juneau alaska usa"],
+["Jyv&auml;skyl&auml;, Finland", 62, 14, 25, 44, "jyvaskyla finland"],
+["K&ouml;ln, North Rhine-Westphalia, Germany", 50, 57, 6, 58, "koln north rhine-westphalia germany"],
+["Kabul, Afghanistan", 34, 31, 69, 11, "kabul afghanistan"],
+["Kaesong, North Korea", 37, 58, 126, 33, "kaesong north korea"],
+["Kaliningrad, Russia", 54, 43, 20, 31, "kaliningrad russia"],
+["Kamloops, British Columbia, Canada", 50, 41, -120, 20, "kamloops british columbia canada"],
+["Kampala, Uganda", 0, 19, 32, 35, "kampala uganda"],
+["Kandahar, Afghanistan", 31, 37, 65, 43, "kandahar afghanistan"],
+["Kandy, Sri Lanka", 7, 17, 80, 38, "kandy sri lanka"],
+["Kano, Nigeria", 12, 0, 8, 31, "kano nigeria"],
+["Kanpur, Uttar Pradesh, India", 26, 27, 80, 20, "kanpur uttar pradesh india"],
+["Kansas City, Missouri, Missouri, USA", 39, 6, -94, 34, "kansas city missouri missouri usa"],
+["Kaohsiung, Taiwan", 22, 38, 120, 16, "kaohsiung taiwan"],
+["Karachi, Sindh, Pakistan", 24, 51, 67, 0, "karachi sindh pakistan"],
+["Kathmandu, Nepal", 27, 43, 85, 22, "kathmandu nepal"],
+["Katowice, Silesian, Poland", 50, 16, 19, 1, "katowice silesian poland"],
+["Kawasaki, Kanagawa, Japan", 35, 30, 139, 45, "kawasaki kanagawa japan"],
+["Kazan, Russia", 55, 47, 49, 10, "kazan russia"],
+["Kelowna, British Columbia, Canada", 49, 32, -119, 18, "kelowna british columbia canada"],
+["Kemi, Finland", 65, 44, 24, 34, "kemi finland"],
+["Kemij&auml;rvi, Finland", 66, 42, 27, 26, "kemijarvi finland"],
+["Key West, Florida, USA", 24, 33, -81, 47, "key west florida usa"],
+["Kharkiv, Ukraine", 49, 55, 36, 19, "kharkiv ukraine"],
+["Khartoum, Soundan", 15, 34, 33, 36, "khartoum soundan"],
+["Khon Kaen, Thailand", 16, 26, 102, 50, "khon kaen thailand"],
+["Kiel, Germany", 54, 20, 10, 8, "kiel germany"],
+["Kiev, Ukraine", 50, 27, 30, 30, "kiev ukraine"],
+["Kigali, Rwanda", -1, 56, 30, 3, "kigali rwanda"],
+["Kimberley, Northern Cape, South Africa", -28, 45, 24, 46, "kimberley northern cape south africa"],
+["Kingston, Jamaica", 17, 59, -76, 48, "kingston jamaica"],
+["Kingston, Norfolk Island, Australia", -29, 4, 167, 58, "kingston norfolk island australia"],
+["Kingstown, Saint Vincent and the Grenadines", 13, 10, -61, 14, "kingstown saint vincent and the grenadines"],
+["Kinshasa, Republic of the Congo", -4, 19, 15, 19, "kinshasa republic of the congo"],
+["Kirkuk, Iraq", 35, 28, 44, 24, "kirkuk iraq"],
+["Kiruna, Sweden", 67, 51, 20, 13, "kiruna sweden"],
+["Kismayo, Somalia", -0, 21, 42, 33, "kismayo somalia"],
+["Knoxville, Tennessee, USA", 35, 38, -83, 55, "knoxville tennessee usa"],
+["Kobe, Japan", 34, 41, 135, 12, "kobe japan"],
+["Kolkata, West Bengal, India", 22, 34, 88, 22, "kolkata kolkota calcutta west bengal india"],
+["Konya, Turkey", 37, 52, 32, 29, "konya turkey"],
+["Koror, Palau", 7, 21, 134, 28, "koror palau"],
+["Kota Bharu, Kelantan, Malaysia", 6, 8, 102, 15, "kota bharu kelantan malaysia"],
+["Kota Kinabalu, Sabah, Malaysia", 5, 58, 116, 5, "kota kinabalu sabah malaysia"],
+["Krak&oacute;w, Poland", 50, 3, 19, 56, "krakow poland"],
+["Krasnodar, Russia", 45, 2, 38, 58, "krasnodar russia"],
+["Krasnoyarsk, Russia", 56, 1, 93, 4, "krasnoyarsk russia"],
+["Kristiansand, Norway", 58, 10, 8, 2, "kristiansand norway"],
+["Kuala Lumpur, Malaysia", 3, 8, 101, 41, "kuala lumpur malaysia"],
+["Kuching, Sarawak, Malaysia", 1, 33, 110, 21, "kuching sarawak malaysia"],
+["Kulpahar, India", 25, 19, 79, 38, "kulpahar india"],
+["Kumasi, Ghana ", 6, 41, -1, 37, "kumasi ghana "],
+["Kunming, Yunnan, China", 25, 4, 102, 41, "kunming yunnan china"],
+["Kuopio, Finland", 62, 53, 27, 40, "kuopio finland"],
+["Kuusamo, Finland", 65, 58, 29, 11, "kuusamo finland"],
+["Kuwait City, Kuwait", 29, 22, 47, 58, "kuwait city kuwait"],
+["Kyoto, Japan", 35, 1, 135, 45, "kyoto japan"],
+["La Paz, Bolivia", -16, 30, -68, 8, "la paz bolivia"],
+["La Serena, Chile", -29, 54, -71, 15, "la serena chile"],
+["Labasa, Fiji", -16, 26, 179, 22, "labasa fiji"],
+["Lagos, Nigeria", 6, 27, 3, 23, "lagos nigeria"],
+["Lahore, Punjab, Pakistan", 31, 33, 74, 20, "lahore punjab pakistan"],
+["Lahti, Finland", 60, 59, 25, 39, "lahti finland"],
+["Lanzhou, Gansu, China", 36, 2, 103, 48, "lanzhou gansu china"],
+["Las Palmas de Gran Canaria, Canary Islands, Spain", 28, 9, -15, 25, "las palmas de gran canaria canary islands spain"],
+["Las Vegas, Nevada, USA", 36, 11, -115, 13, "las vegas nevada usa"],
+["Latakia, Syria", 35, 31, 35, 47, "latakia syria"],
+["Lausanne, Switzerland", 46, 31, 6, 38, "lausanne switzerland"],
+["Leeds, England, Great Britain", 53, 48, -1, 33, "leeds england great britain"],
+["Leicester, England, Great Britain", 52, 63, -1, 14, "leicester england great britain"],
+["Leiden, Netherlands", 52, 9, 4, 30, "leiden netherlands"],
+["Leipzig, Saxony, Germany", 51, 20, 12, 23, "leipzig saxony germany"],
+["Le&oacute;n, Guanajuato, Mexico", 21, 7, -101, 41, "leon guanajuato mexico"],
+["Lhasa, Tibet, China", 29, 39, 91, 7, "lhasa tibet china"],
+["Liberia, Republic of Liberia", 10, 38, -85, 26, "liberia republic of liberia"],
+["Libreville, Gabon", 0, 23, 9, 27, "libreville gabon"],
+["Lillehammer, Norway", 61, 7, 10, 25, "lillehammer norway"],
+["Lilongwe, Malawi", -13, 59, 33, 47, "lilongwe malawi"],
+["Lima, Peru", -12, 2, -77, 1, "lima peru"],
+["Limon, Republic of Liberia", 9, 59, -83, 2, "limon republic of liberia"],
+["Lincoln, Nebraska, USA", 40, 48, -96, 40, "lincoln nebraska usa"],
+["Linz, Austria", 48, 18, 14, 17, "linz austria"],
+["Lisbon, Portugal", 38, 42, -9, 11, "lisbon portugal"],
+["Little Rock, Arkansas, USA", 34, 44, -92, 19, "little rock arkansas usa"],
+["Liverpool, England, Great Britain", 53, 25, -2, 59, "liverpool england great britain"],
+["Livingstone, Zambia", -17, 51, 25, 52, "livingstone zambia"],
+["Ljubljana, Slovenia", 46, 4, 14, 30, "ljubljana slovenia"],
+["Lobamba, Swaziland", -26, 28, 31, 12, "lobamba swaziland"],
+["Lom&eacute;, Togo", 6, 8, 1, 12, "lome togo"],
+["London, England, Great Britain", 51, 30, -0, 8, "london england great britain"],
+["Long Beach, California, USA", 33, 48, -118, 9, "long beach california usa"],
+["Longyearbyen, Svalbard, Norway", 78, 13, 15, 33, "longyearbyen svalbard norway"],
+["Los Angeles, California, USA", 34, 3, -118, 15, "LAX los angeles california usa"],
+["Louisville, Kentucky, USA", 38, 15, -85, 46, "louisville kentucky usa"],
+["Luanda, Angola", -8, 50, 13, 14, "luanda angola"],
+["Lubumbashi, Republic of the Congo", -11, 40, 27, 28, "lubumbashi republic of the congo"],
+["Lucknow, Uttar Pradesh, India", 26, 51, 80, 55, "lucknow uttar pradesh india"],
+["Ludhiana, Punjab, India", 30, 54, 75, 51, "ludhiana punjab india"],
+["Lule&aring;, Sweden", 65, 60, 22, 13, "lulea sweden"],
+["Lusaka, Zambia", -15, 25, 28, 17, "lusaka zambia"],
+["Luxembourg, Luxembourg", 49, 37, 6, 8, "luxembourg luxembourg"],
+["Luxor, Egypt", 25, 41, 32, 39, "luxor egypt"],
+["Lviv, Lviv Oblast, Ukraine", 49, 51, 24, 1, "lviv lviv oblast ukraine"],
+["Lyon, France", 45, 46, 4, 50, "lyon france"],
+["Maastricht, Netherlands", 50, 51, 5, 41, "maastricht netherlands"],
+["Macap&aacute;, Brazil", 0, 2, -51, 3, "macapa brazil"],
+["Macau, China", 22, 10, 113, 33, "macau china"],
+["Macei&oacute;, Alagoas, Brazil", -9, 39, -35, 44, "maceio alagoas brazil"],
+["Madrid, Spain", 40, 23, -3, 43, "madrid spain"],
+["Mafikeng, South Aftica", -25, 51, 25, 38, "mafikeng south aftica"],
+["Magadan, Russia", 59, 34, 150, 48, "magadan russia"],
+["Majuro, Marshal Islands", 7, 40, 171, 16, "majuro marshal islands"],
+["Makassar, Indonesia", -5, 8, 119, 25, "makassar indonesia"],
+["Makati City, Philippines", 14, 33, 121, 2, "makati city philippines"],
+["Malabo, Equatorial Guinea", 3, 45, 8, 46, "malabo equatorial guinea"],
+["Malacca Town, Malacca, Malaysia", 2, 11, 102, 23, "malacca town malacca malaysia"],
+["M&aacute;laga, Andalusia, Spain", 36, 43, -4, 25, "malaga andalusia spain"],
+["Malang, Indonesia", -7, 58, 112, 37, "malang indonesia"],
+["Mal&eacute;, Maldives", 4, 10, 73, 30, "male maldives"],
+["Malm&ouml;, Sweden", 55, 35, 13, 2, "malmo sweden"],
+["Mamoudzou, Mayotte, France", -12, 47, 45, 13, "mamoudzou mayotte france"],
+["Managua, Nicaragua", 12, 8, -86, 15, "managua nicaragua"],
+["Manama, Bahrain", 26, 13, 50, 35, "manama bahrain"],
+["Manaus, Amazonas, Brazil", -3, 6, -60, 1, "manaus amazonas brazil"],
+["Manchester, England, Great Britain", 53, 29, -2, 15, "manchester england great britain"],
+["Mandurah, Western Australia, Australia", -32, 31, 115, 43, "mandurah western australia australia"],
+["Manila, Philippines", 14, 35, 120, 58, "manila philippines"],
+["Manzini, Swaziland", -26, 29, 31, 22, "manzini swaziland"],
+["Maputo, Mozambique", -25, 58, 32, 35, "maputo mozambique"],
+["Marrakech, Morocco", 31, 8, -8, 0, "marrakech morocco"],
+["Marseille, France", 43, 18, 5, 22, "marseille france"],
+["Maseru, Lesotho", -29, 18, 27, 28, "maseru lesotho"],
+["Mashhad, Iran", 36, 18, 59, 37, "mashhad iran"],
+["Mata-Utu, Wallis and Futuna, France", -13, 17, 176, 11, "mata-utu wallis and futuna france"],
+["Mbabane, Swaziland", -26, 19, 31, 8, "mbabane swaziland"],
+["McMurdo Station, Antarctica", -77, 51, 166, 40, "mcmurdo station antarctica"],
+["Mecca, Saudi Arabia", 21, 25, 39, 49, "mecca saudi arabia"],
+["Medan, Indonesia", 3, 35, 98, 40, "medan indonesia"],
+["MedellÃ­n, Colombia", 6, 14, -75, 34, "medellin colombia"],
+["Medina, Saudi Arabia", 24, 28, 39, 36, "medina saudi arabia"],
+["Melbourne, Victoria, Australia", -37, 48, 144, 57, "melbourne victoria australia"],
+["Melekeok, Palau", 7, 30, 134, 37, "melekeok palau"],
+["Memphis, Tennessee, USA", 35, 7, -89, 58, "memphis tennessee usa"],
+["Mendoza, Argentina", -32, 53, -68, 50, "mendoza argentina"],
+["MÃ©rida, YucatÃ¡n, Mexico", 20, 58, -89, 37, "merida yucatan mexico"],
+["Messina, Italy", 38, 11, 15, 33, "messina italy"],
+["Mexicali, Baja California, Mexico", 32, 40, -115, 28, "mexicali baja california mexico"],
+["Mexico City, Mexico", 19, 24, -99, 7, "mexico city mexico"],
+["Miami, Florida, USA", 25, 47, -80, 13, "miami florida usa"],
+["Milan, Italy", 45, 28, 9, 10, "milan italy"],
+["Milwaukee, Wisconsin, USA", 43, 3, -87, 57, "milwaukee wisconsin usa"],
+["Minneapolis, Minnesota, USA", 44, 58, -93, 15, "minneapolis minnesota usa"],
+["Minsk, Belarus", 53, 54, 27, 34, "minsk belarus"],
+["Miri, Sarawak, Malaysia", 4, 23, 113, 58, "miri sarawak malaysia"],
+["Moab, Utah, USA", 38, 34, -109, 33, "moab utah usa"],
+["Mogadishu, Somalia", 2, 2, 45, 21, "mogadishu somalia"],
+["Mombasa, Kenya", -4, 3, 39, 40, "mombasa kenya"],
+["Moncton, New Brunswick, Canada", 46, 8, -64, 46, "moncton new brunswick canada"],
+["Monrovia, Liberia", 6, 19, -10, 46, "monrovia liberia"],
+["Monte-Carlo, Monaco", 43, 44, 7, 24, "monte-carlo monaco"],
+["Monterrey, Nuevo LeÃ³n, Mexico", 25, 40, -100, 18, "monterrey nuevo leon mexico"],
+["Montevideo, Uruguay", -34, 55, -56, 10, "montevideo uruguay"],
+["Montpelier, France", 43, 36, 3, 52, "montpelier france"],
+["Montpelier, Vermont, USA", 44, 15, -72, 34, "montpelier vermont usa"],
+["Montreal, Quebec, Canada", 45, 31, -73, 33, "montreal quebec canada"],
+["Moroni, Comoros", -11, 45, 43, 12, "moroni comoros"],
+["Moscow, Russia", 55, 45, 37, 37, "moscow russia"],
+["Mosul, Iraq", 36, 22, 43, 7, "mosul iraq"],
+["Moundou, Chad", 8, 34, -16, 5, "moundou chad"],
+["Mountain View, California, USA", 32, 23, -122, 2, "mountain view california usa"],
+["Multan, Punjab, Pakistan", 30, 12, 71, 27, "multan punjab pakistan"],
+["Mumbai, India", 18, 58, 72, 49, "mumbai bombay india"],
+["Mumbai, Maharashtra, India", 18, 57, 72, 49, "mumbai maharashtra india"],
+["Munich, Bavaria, Germany", 48, 8, 11, 34, "munich bavaria germany"],
+["Murmansk, Russia", 68, 58, 33, 5, "murmansk russia"],
+["Muscat, Oman", 23, 36, 58, 32, "muscat oman"],
+["Mwanza, Tanzania", -2, 31, 32, 54, "mwanza tanzania"],
+["N'Djamena, Chad", 12, 6, 15, 3, "n'djamena ndjamena chad"],
+["Nagoya, Japan", 35, 7, 136, 56, "nagoya japan"],
+["Nagpur, Maharashtra, India", 21, 4, 79, 1, "nagpur maharashtra india"],
+["Nairobi, Kenya", -1, 17, 36, 48, "nairobi kenya"],
+["Nakhon Ratchasima, Thailand ", 14, 58, 102, 6, "nakhon ratchasima thailand "],
+["Namangan, Uzbekistan", 40, 98, 71, 58, "namangan uzbekistan"],
+["Nanjing, Jiangsu, China", 32, 3, 118, 46, "nanjing nanking jiangsu china"],
+["Nanning, Guangxi, China", 22, 49, 108, 19, "nanning guangxi china"],
+["Nantes, France", 47, 13, -1, 33, "nantes france"],
+["Naples, Italy", 40, 50, 14, 15, "naples italy"],
+["Nashville, Tennessee, Tennessee, USA", 36, 10, -86, 47, "nashville tennessee tennessee usa"],
+["Nassau, Bahamas", 25, 3, -77, 20, "nassau bahamas"],
+["Naypyidaw, Burma (Myanmar)", 19, 45, 96, 6, "naypyidaw burma (myanmar)"],
+["Ndola, Zambia", -12, 58, 28, 38, "ndola zambia"],
+["Nelspruit, Mpumalanga, South Africa", -25, 28, 30, 59, "nelspruit mpumalanga south africa"],
+["New Delhi, Delhi, India", 28, 37, 77, 12, "new delhi delhi india"],
+["New Orleans, Louisiana, USA", 29, 58, -90, 4, "new orleans louisiana usa"],
+["New York City, New York, USA", 40, 43, -74, 0, "new york city new york usa"],
+["Newcastle upon Tyne, England, Great Britain", 54, 58, -1, 36, "newcastle upon tyne england great britain"],
+["Newcastle, New South Wales, Australia ", -32, 55, 151, 47, "newcastle new south wales australia "],
+["Niamey, Niger", 13, 31, 2, 6, "niamey niger"],
+["Nice, Provence-Alpes-CÃ´te d'Azur, France", 43, 42, 7, 16, "nice provence-alpes-cote d'azur france"],
+["Nicosia, Cyprus", 35, 10, 33, 21, "nicosia cyprus"],
+["Nizhny Novgorod, Russia", 56, 20, 44, 0, "nizhny novgorod russia"],
+["Norilsk, Russia", 69, 21, 88, 12, "norilsk russia"],
+["Norrk&ouml;ping, Sweden", 58, 36, 16, 12, "norrkoping sweden"],
+["North Bay, Ontario, Ontario, Canada", 46, 22, -79, 25, "north bay ontario ontario canada"],
+["Norwich, England, Great Britain", 52, 63, 1, 29, "norwich england great britain"],
+["Nottingham, England, Great Britain", 52, 57, -1, 8, "nottingham england great britain"],
+["Nouakchott, Mauritania", 18, 6, -15, 57, "nouakchott mauritania"],
+["NoumÃ©a, New Caledonia, France", -22, 16, 166, 27, "noumea new caledonia france"],
+["Novosibirsk, Russia", 55, 1, 82, 56, "novosibirsk russia"],
+["Nuku'Alofa, Tonga", -21, 80, -175, 12, "nuku'alofa tonga"],
+["Nukus, Karakalpakstan, Uzbekistan", 42, 28, 59, 36, "nukus karakalpakstan uzbekistan"],
+["Nuuk, Greenland", 64, 10, -51, 43, "nuuk greenland"],
+["Nz&eacute;r&eacute;kor&eacute;, Guinea", 7, 45, -8, 49, "nzerekore guinea"],
+["Oakland, California, USA", 37, 48, -122, 16, "oakland california usa"],
+["Odense, Denmark", 55, 23, 10, 23, "odense denmark"],
+["Odessa, Ukraine", 46, 28, 30, 44, "odessa ukraine"],
+["Okinawa, Japan", 26, 20, 127, 48, "okinawa japan"],
+["Oklahoma City, Oklahoma, USA", 35, 29, -97, 32, "oklahoma city oklahoma usa"],
+["Olympic National Park, Washington, USA", 47, 58, -123, 30, "olympic national park washington usa"],
+["Omdurman, Sudan", 15, 39, 32, 29, "omdurman sudan"],
+["Omsk, Russia", 54, 59, 73, 22, "omsk russia"],
+["Oranjestad, Aruba, Netherlands", 12, 31, -70, 2, "oranjestad aruba netherlands"],
+["Orlando, Florida, USA", 28, 25, -81, 19, "orlando florida usa"],
+["&Ouml;rnsk&ouml;ldsvik, Sweden", 63, 30, 18, 72, "ornskoldsvik sweden"],
+["Osaka, Japan", 34, 42, 135, 30, "osaka japan"],
+["Oslo, Norway", 59, 57, 10, 45, "oslo norway"],
+["&Ouml;stersund, Sweden", 63, 18, 14, 65, "ostersund sweden"],
+["Ottawa, Ontario, Canada", 45, 25, -75, 41, "ottawa ontario canada"],
+["Ouagadougou, Burkina Faso", 12, 21, -1, 32, "ouagadougou burkina faso"],
+["Oulu, Finland", 65, 1, 25, 28, "oulu finland"],
+["Oxford, England, Great Britain", 51, 45, -1, 15, "oxford england great britain"],
+["Padang, Indonesia", -0, 57, 100, 21, "padang indonesia"],
+["Pago Pago, American Samoa, USA", -14, 16, -170, 42, "pago pago american samoa usa"],
+["Palembang, Indonesia", -2, 59, 104, 45, "palembang indonesia"],
+["Palermo, Italy", 38, 7, 13, 22, "palermo italy"],
+["Palikir, Micronesia", 6, 55, 158, 11, "palikir micronesia"],
+["Palma, Majorca, Balearic Islands, Spain", 39, 34, 2, 39, "palma majorca balearic islands spain"],
+["Palmas, Tocantins, Brazil", -10, 12, -48, 21, "palmas tocantins brazil"],
+["Palo Alto, California, USA", 37, 25, -122, 8, "palo alto california usa"],
+["Panama City, Panama", 8, 59, -79, 31, "panama city panama"],
+["Papeete, French Polynesia, France", -17, 32, -149, 34, "papeete french polynesia france"],
+["Paramaribo, Suriname", 5, 52, -55, 10, "paramaribo suriname"],
+["Paris, France", 48, 52, 2, 20, "paris france"],
+["Patna, Bihar, India ", 25, 36, 85, 8, "patna bihar india "],
+["Pattaya, Thailand", 12, 55, 100, 52, "pattaya thailand"],
+["Pekanbaru, Indonesia", 0, 32, 101, 27, "pekanbaru indonesia"],
+["Pelotas, Rio Grande do Sul, Brazil", -31, 46, -52, 21, "pelotas rio grande do sul brazil"],
+["Perm, Russia", 58, 0, 56, 19, "perm russia"],
+["Perth, Western Australia, Australia", -31, 58, 115, 49, "perth western australia australia"],
+["Peshawar, Pakistan", 34, 0, 71, 30, "peshawar pakistan"],
+["Peterborough, England, Great Britain", 52, 35, -0, 15, "peterborough england great britain"],
+["Petropavlovsk-Kamchatsky, Russia", 53, 1, 158, 39, "petropavlovsk-kamchatsky russia"],
+["Philadelphia, Pennsylvania, USA", 39, 57, -75, 10, "philadelphia pennsylvania usa"],
+["Phnom Penh, Cambodia", 11, 33, 104, 55, "phnom penh cambodia"],
+["Phoenix, Arizona, Arizona, USA", 33, 32, -112, 5, "phoenix arizona arizona usa"],
+["Phuket (city), Thailand", 7, 53, 98, 24, "phuket (city) thailand"],
+["Pierre, South Dakota, USA", 44, 22, -100, 20, "pierre south dakota usa"],
+["Pietermaritzburg, KwaZulu-Natal, South Africa", -29, 37, 30, 23, "pietermaritzburg kwazulu-natal south africa"],
+["Pite&aring;, Sweden", 65, 32, 21, 51, "pitea sweden"],
+["Pittsburgh, Pennsylvania, USA", 40, 27, -80, 0, "pittsburgh pennsylvania usa"],
+["Plymouth, England, Great Britain", 50, 22, -4, 8, "plymouth england great britain"],
+["Podgorica, Montenegro", 42, 28, 19, 17, "podgorica montenegro"],
+["Polokwane, Limpopo, South Africa", -23, 54, 29, 27, "polokwane limpopo south africa"],
+["Pontianak, Indonesia", 0, 0, 109, 20, "pontianak indonesia"],
+["Port Blair, Andaman and Nicobar Islands, India", 11, 40, 92, 45, "port blair andaman and nicobar islands india"],
+["Port Elizabeth, Eastern Cape, South Africa", -33, 57, 25, 38, "port elizabeth eastern cape south africa"],
+["Port Hedland, Western Australia, Australia", -20, 18, 118, 36, "port hedland western australia australia"],
+["Port Louis, Mauritius", -20, 10, 57, 31, "port louis mauritius"],
+["Port Moresby, Papua New Guinea", -9, 30, 147, 12, "port moresby papua new guinea"],
+["Port of Spain, Trinidad and Tobago", 10, 40, -61, 31, "port of spain trinidad and tobago"],
+["Port Said, Egypt", 31, 15, 32, 17, "port said egypt"],
+["Port Vila, Vanuatu", -17, 45, 168, 18, "port vila vanuatu"],
+["Port-au-Prince, Haiti", 18, 32, -72, 20, "port-au-prince haiti"],
+["Portland, Oregon, USA", 45, 31, -122, 41, "portland oregon usa"],
+["Porto Alegre, Rio Grande do Sul, Brazil", 30, 2, -51, 13, "porto alegre rio grande do sul brazil"],
+["Porto Velho, RondÃ´nia, Brazil", -8, 46, -63, 54, "porto velho rondonia brazil"],
+["Porto-Novo, Benin", 6, 30, 2, 36, "porto-novo benin"],
+["Porto, Portugal", 41, 9, -8, 38, "porto portugal"],
+["Portsmouth, England, Great Britain", 50, 49, -1, 5, "portsmouth england great britain"],
+["Prague, Czech Republic", 50, 5, 14, 26, "prague czech republic"],
+["Praia, Cape Verde", 14, 55, -23, 31, "praia cape verde"],
+["Pretoria, Gauteng, South Africa", -25, 44, 28, 11, "pretoria gauteng south africa"],
+["Pristina, Kosovo", 42, 40, 21, 10, "pristina kosovo"],
+["Providence, Rhode Island, USA", 41, 49, -71, 25, "providence rhode island usa"],
+["Pudasj&auml;rvi, Finland", 65, 21, 27, 0, "pudasjarvi finland"],
+["Puebla, Puebla, Mexico", 19, 3, -98, 12, "puebla puebla mexico"],
+["Puerto AisÃ©n, Chile", -45, 24, -72, 41, "puerto aisen chile"],
+["Puerto Ayacucho, Venezuela", 5, 40, -67, 38, "puerto ayacucho venezuela"],
+["Puerto Montt, Chile", -41, 28, -72, 56, "puerto montt chile"],
+["Puerto Toro, Chile", -55, 1, -67, 6, "puerto toro chile"],
+["Puerto Vallarta, Jalisco, Mexico", 20, 40, -105, 16, "puerto vallarta jalisco mexico"],
+["Puerto Williams, Chile", 54, 56, -67, 37, "puerto williams chile"],
+["Pune, Maharashtra, India", 18, 31, 73, 51, "pune maharashtra india"],
+["Punta Arenas, Chile", -53, 10, -70, 56, "punta arenas chile"],
+["Puntarenas, Republic of Liberia", 9, 58, -84, 50, "puntarenas republic of liberia"],
+["Pyongyang, North Korea", 39, 2, 125, 45, "pyongyang north korea"],
+["Qaanaaq, Qaasuitsup, Greenland", 77, 28, -69, 14, "qaanaaq qaasuitsup greenland"],
+["Qingdao, Shandong, China", 36, 5, 120, 20, "qingdao shandong china"],
+["Quebec City, Quebec, Canada", 46, 48, -71, 13, "quebec city quebec canada"],
+["Quetzaltenango, Guatemala", 14, 50, -91, 31, "quetzaltenango guatemala"],
+["Quezon City, Philippines", 14, 38, 121, 2, "quezon city philippines"],
+["Quito, Ecuador", 0, 15, -78, 35, "quito ecuador"],
+["Rabat, Morocco", 34, 2, -6, 50, "rabat morocco"],
+["Rabi Island, Fiji", -16, 30, -180, 0, "rabi island fiji"],
+["Raleigh, North Carolina, USA", 35, 49, -78, 38, "raleigh north carolina usa"],
+["Rawalpindi, Punjab, Pakistan", 33, 36, 73, 2, "rawalpindi punjab pakistan"],
+["Recife, Pernambuco, Brazil", -8, 4, -34, 52, "recife pernambuco brazil"],
+["Regina, Saskatchewan, Canada", 50, 26, -104, 37, "regina saskatchewan canada"],
+["Reno, Nevada, Nevada, USA", 39, 31, -119, 49, "reno nevada nevada usa"],
+["Reykjav&iacute;k, Iceland", 64, 8, -21, 56, "reykjavik iceland"],
+["Riga, Latvia", 56, 58, 24, 8, "riga latvia"],
+["Rio Branco, Acre, Brazil", -9, 59, -67, 48, "rio branco acre brazil"],
+["Rio de Janeiro, Rio de Janeiro, Brazil", -22, 54, -43, 14, "rio de janeiro rio de janeiro brazil"],
+["Riverside, California, USA", 33, 56, -117, 23, "riverside california usa"],
+["Riyadh, Saudi Arabia", 24, 42, 46, 43, "riyadh saudi arabia"],
+["Road Town, British Virgin Islands", 18, 26, -64, 37, "road town british virgin islands"],
+["Rockhampton, Queensland, Australia", -23, 22, 150, 30, "rockhampton queensland australia"],
+["Rocky Mountain National Park, Colorado, USA", 40, 20, -105, 42, "rocky mountain national park colorado usa"],
+["Rome, Italy", 41, 54, 12, 30, "rome italy"],
+["Rosario, Santa Fe, Argentina", -32, 57, -60, 40, "rosario santa fe argentina"],
+["Roseau, Dominica", 15, 18, -61, 23, "roseau dominica"],
+["Rostov-on-Don, Russia", 47, 14, 39, 42, "rostov-on-don russia"],
+["Rotterdam, Netherlands", 51, 56, 4, 28, "rotterdam netherlands"],
+["Rovaniemi, Finland", 66, 30, 25, 44, "rovaniemi finland"],
+["&Scaron;abac, Serbia", 44, 45, 19, 41, "sabac serbia"],
+["Sabha (city), Lybia", 27, 2, 14, 26, "sabha (city) lybia"],
+["Sacramento, California, USA", 38, 33, -121, 28, "sacramento california usa"],
+["Saint John, New Brunswick, Canada", 45, 17, -66, 4, "saint john new brunswick canada"],
+["Saint Petersburg, Russia", 59, 56, 30, 20, "saint petersburg russia"],
+["Saint-Denis, RÃ©union, France", -20, 52, 55, 27, "saint-denis reunion france"],
+["Saint-Pierre, Saint Pierre and Miquelon, France", 46, 46, -56, 10, "saint-pierre saint pierre and miquelon france"],
+["Saipan, Northern Mariana Islands, USA", 15, 11, 145, 45, "saipan northern mariana islands usa"],
+["Salt Lake City, Utah, USA", 40, 45, -111, 53, "salt lake city utah usa"],
+["Salvador, Bahia, Brazil", -12, 58, -38, 30, "salvador bahia brazil"],
+["Salzburg, Austria", 47, 48, 13, 2, "salzburg austria"],
+["Samara, Russia", 53, 14, 50, 10, "samara russia"],
+["San Antonio, Texas, USA", 29, 32, -98, 28, "san antonio texas usa"],
+["San Carlos de Bariloche, RÃ­o Negro Province, Argentina", -41, 9, -71, 18, "san carlos de bariloche rio negro province argentina"],
+["San Diego, California, USA", 32, 43, -117, 10, "SD san diego california usa"],
+["San Fernando, Trinidad and Tobago", 10, 17, -61, 28, "san fernando trinidad and tobago"],
+["San Francisco, California, USA", 37, 46, -122, 25, "SFO san francisco fransisco california usa"],
+["San Jose, California, USA", 37, 20, -121, 53, "san jose california usa"],
+["San JosÃ©, Costa Rica", 9, 56, -84, 5, "san jose costa rica"],
+["San Juan, Puerto Rico, USA", 18, 27, -66, 4, "san juan puerto rico usa"],
+["San Luis PotosÃ­, Mexico", 22, 16, -100, 98, "san luis potosi mexico"],
+["San Marino, San Marino", 43, 56, 12, 26, "san marino san marino"],
+["San Miguel de TucumÃ¡n, TucumÃ¡n, Argentina", -26, 50, -65, 13, "san miguel de tucuman tucuman argentina"],
+["San Salvador, El Salvador", 13, 41, -89, 11, "san salvador el salvador"],
+["San&lsquo;a&rsquo, Yemen", 15, 21, 44, 12, "san'a sana yemen"],
+["Santa Ana, California, USA", 33, 44, -117, 52, "santa ana anna california usa"],
+["Santa Cruz de la Sierra, Bolivia", -17, 48, -63, 10, "santa cruz de la sierra bolivia"],
+["Santa Cruz de Tenerife, Canary Islands, Spain", 28, 28, -16, 15, "santa cruz de tenerife canary islands spain"],
+["Santiago de Cali, Colombia", 3, 25, -76, 32, "santiago de cali colombia"],
+["Santiago de Cuba, Cuba ", 20, 1, -75, 48, "santiago de cuba cuba "],
+["Santiago de QuerÃ©taro, QuerÃ©taro, Mexico", 20, 36, -100, 23, "santiago de queretaro queretaro mexico"],
+["Santiago, Chile", -33, 27, -70, 39, "santiago chile"],
+["Santo Domingo, Dominican Republic", 18, 29, -69, 55, "santo domingo dominican republic"],
+["S&atilde;o Jos&eacute; dos Campos, S&atilde;o Paulo, Brazil", -23, 11, -45, 52, "sao jose dos campos sao paulo brazil"],
+["S&atilde;o Lu&iacute;s, Maranh&atilde;o, Brazil", -2, 32, -44, 18, "sao luis maranhao brazil"],
+["S&atilde;o Paulo, S&atilde;o Paulo, Brazil", -23, 33, -46, 38, "sao paulo sao paulo brazil"],
+["S&atilde;o Tom&eacute;, S&atilde;o Tom&eacute; and Pr&iacute;ncipe", 0, 20, 6, 41, "sao tome sao tome and principe"],
+["Sapporo, Japan", 43, 4, 141, 21, "sapporo japan"],
+["Sarajevo, Bosnia and Herzegovina", 43, 51, 18, 21, "sarajevo bosnia and herzegovina"],
+["Saratov, Russia", 51, 32, 46, 1, "saratov russia"],
+["Sarpsborg, Norway", 59, 17, 11, 6, "sarpsborg norway"],
+["Saskatoon, Saskatchewan, Canada", 52, 7, -106, 39, "saskatoon saskatchewan canada"],
+["Sault Ste. Marie, Ontario, Canada", 46, 32, -84, 20, "sault ste. marie ontario canada"],
+["Seattle, Washington, USA", 47, 36, -122, 19, "seattle washington usa"],
+["Sekondi-Takoradi, Ghana", 4, 55, -1, 46, "sekondi-takoradi ghana"],
+["Semarang, Indonesia", -6, 58, 110, 25, "semarang indonesia"],
+["Seoul, South Korea", 37, 33, 126, 59, "seoul south korea"],
+["Serekunda, The Gambia", 13, 26, 16, 40, "serekunda the gambia"],
+["Seville, Andalusia, Spain", 37, 23, -5, 59, "seville andalusia spain"],
+["Sfax, Tunisia", 34, 44, 10, 46, "sfax tunisia"],
+["Shanghai, China", 31, 10, 121, 28, "shanghai china"],
+["Sheffield, England, Great Britain", 53, 23, -1, 28, "sheffield england great britain"],
+["Shenyang, Liaoning, China", 41, 47, 123, 27, "shenyang liaoning china"],
+["Shenzhen, Guangdong, China", 22, 33, 114, 6, "shenzhen guangdong china"],
+["Shigatse, Tibet, China", 29, 16, 88, 52, "shigatse tibet china"],
+["Shijiazhuang, Hubei, China", 38, 2, 114, 30, "shijiazhuang hubei china"],
+["Shillong, Meghalaya, India", 25, 34, 91, 53, "shillong meghalaya india"],
+["Shimla, Himachal Pradesh, India", 31, 6, 77, 10, "shimla himachal pradesh india"],
+["Siem Reap, Cambodia", 13, 21, 103, 51, "siem reap cambodia"],
+["Siliguri, West Bengal, India", 26, 44, 88, 26, "siliguri west bengal india"],
+["Simferopol, Crimea, Ukraine", 44, 57, 34, 6, "simferopol crimea ukraine"],
+["Singapore, Singapore", 1, 22, 103, 48, "singapore singapore"],
+["Sinop, Mato Grosso, Brazil", -11, 52, -55, 30, "sinop mato grosso brazil"],
+["Sitka, Alaska, Alaska, USA", 57, 3, -135, 19, "sitka alaska alaska usa"],
+["SkellefteÃ¥, Sweden", 64, 76, 20, 99, "skelleftea sweden"],
+["Skopje, Macedonia", 42, 0, 21, 26, "skopje macedonia"],
+["Sochi, Russia", 43, 35, 39, 43, "sochi russia"],
+["Sofia, Bulgaria", 42, 42, 23, 20, "sofia bulgaria"],
+["South Tarawa, Kiribati", 1, 19, 172, 58, "south tarawa kiribati"],
+["Southampton, England, Great Britain", 51, 0, -1, 4, "southampton england great britain"],
+["Split (city), Croatia", 43, 30, 16, 26, "split (city) croatia"],
+["Springfield, Missouri, USA", 37, 12, -93, 17, "springfield missouri usa"],
+["Sri Jayawardenapura-Kotte, Sri Lanka", 6, 54, 79, 53, "sri jayawardenapura-kotte sri lanka"],
+["Srinagar, Jammu and Kashmir, India", 34, 5, 74, 47, "srinagar jammu and kashmir india"],
+["St. George's, Grenada", 12, 3, -61, 45, "st. george's saint george grenada"],
+["St. John's, Antigua and Barbuda", 17, 7, -61, 51, "st. john's saint john antigua and barbuda"],
+["St. John's, Newfoundland and Labrador, Canada", 47, 33, -52, 40, "st. john's saint john newfoundland and labrador canada"],
+["St. Louis, Missouri, USA", 38, 37, -90, 11, "st. louis saint louis missouri usa"],
+["Stanley, Falkland Islands, Great Britain", 51, 41, -57, 51, "stanley falkland islands great britain"],
+["Stepanakert, Nagorno-Karabakh Republic, Azerbaidjan", 39, 49, 46, 45, "stepanakert nagorno-karabakh republic azerbaidjan"],
+["Stockholm, Sweden", 59, 21, 18, 4, "stockholm sweden"],
+["Stockton, California, USA", 37, 58, -121, 18, "stockton california usa"],
+["Strasbourg, Alsace, France", 48, 35, 7, 45, "strasbourg alsace france"],
+["Stuttgart, Baden-WÃ¼rttemberg, Germany", 48, 46, 9, 10, "stuttgart baden-wurttemberg germany"],
+["Sucre, Bolivia", -19, 2, -65, 15, "sucre bolivia"],
+["Suez, Egypt", 29, 58, 32, 33, "suez egypt"],
+["Sukhumi, Abkhazia, Georgia", 43, 0, 41, 1, "sukhumi abkhazia georgia"],
+["Sundsvall, Sweden", 62, 40, 17, 33, "sundsvall sweden"],
+["Sunnyvale, California, USA", 37, 22, -122, 1, "sunnyvale california usa"],
+["Surabaya, Indonesia", -7, 14, 112, 44, "surabaya indonesia"],
+["Surat Thani, Thailand", 9, 8, 99, 19, "surat thani thailand"],
+["Surat, Gujarat, India", 21, 10, 72, 49, "surat gujarat india"],
+["Suva, Fiji", -18, 8, 178, 26, "suva fiji"],
+["Swansea, Wales, Great Britain", 51, 37, -3, 57, "swansea wales great britain"],
+["Sydney, New South Wales, Australia", -33, 52, 151, 13, "sydney new south wales australia"],
+["Tabriz, Iran", 38, 5, 46, 17, "tabriz iran"],
+["Taichung, Taiwan", 24, 9, 120, 40, "taichung taiwan"],
+["Tainan City, Taiwan", 22, 59, 120, 11, "tainan city taiwan"],
+["Taipei, Taiwan", 25, 2, 121, 38, "taipei taiwan"],
+["Taiyuan, Shanxi, China", 37, 52, 112, 33, "taiyuan shanxi china"],
+["Tallinn, Estonia", 59, 26, 24, 45, "tallinn estonia"],
+["Tamale, Ghana", 9, 24, -0, 51, "tamale ghana"],
+["Tampa, Florida, USA", 27, 58, -82, 27, "tampa florida usa"],
+["Tampere, Finland", 61, 30, 23, 45, "tampere finland"],
+["Tampico, Tamaulipas, Mexico", 22, 22, -97, 85, "tampico tamaulipas mexico"],
+["Tapachula, Chiapas, Mexico", 14, 52, -92, 16, "tapachula chiapas mexico"],
+["Tartu, Estonia", 58, 23, 26, 43, "tartu estonia"],
+["Tashkent, Uzbekistan", 41, 16, 69, 13, "tashkent uzbekistan"],
+["Tbilisi, Georgia", 41, 43, 44, 47, "tbilisi georgia"],
+["Tegucigalpa, Honduras", 14, 5, -87, 13, "tegucigalpa honduras"],
+["Tehran, Iran", 35, 41, 51, 25, "tehran iran"],
+["Tel Aviv, Israel", 32, 5, 34, 48, "tel aviv israel"],
+["Teresina, PiauÃ­, Brazil", -5, 6, -42, 48, "teresina piaui brazil"],
+["Tezpur, Assam, India", 26, 40, 92, 45, "tezpur assam india"],
+["The Hague, Netherlands", 52, 4, 4, 18, "the hague netherlands"],
+["The Valley, Anguilla, Anguilla, Great Britain", 18, 13, -63, 3, "the valley anguilla anguilla great britain"],
+["Thessaloniki, Greece", 40, 38, 22, 57, "thessaloniki greece"],
+["Thimphu, Bhutan", 27, 28, 89, 38, "thimphu bhutan"],
+["Thunder Bay, Ontario, Canada", 48, 22, -89, 19, "thunder bay ontario canada"],
+["Tianjin, China", 39, 8, 117, 11, "tianjin tientsin china"],
+["Tijuana, Baja California, Mexico", 32, 31, -117, 2, "tijuana baja california mexico"],
+["Timbuktu, Mali", 16, 46, -3, 0, "timbuktu mali"],
+["Tirana, Albania", 41, 19, 19, 49, "tirana albania"],
+["Tiraspol, Transnistria, Moldova", 46, 51, 29, 38, "tiraspol transnistria moldova"],
+["Tokyo, Japan", 35, 41, 139, 46, "tokyo japan"],
+["Tolyatti, Russia", 53, 29, 49, 31, "tolyatti russia"],
+["Tornio, Finland", 65, 51, 24, 9, "tornio finland"],
+["Toronto, Ontario, Canada", 43, 39, -79, 23, "toronto ontario canada"],
+["Torre&oacute;n, Coahuila, Mexico", 25, 32, -103, 26, "torreon coahuila mexico"],
+["T&oacute;rshavn, Faroe Islands, Denmark", 62, 0, -6, 46, "torshavn faroe islands denmark"],
+["Toulouse, Midi-PyrÃ©nÃ©es, France", 43, 36, 1, 26, "toulouse midi-pyrenees france"],
+["Townsville, Queensland, Australia", -19, 15, 146, 49, "townsville queensland australia"],
+["Trelew, Chubut, Argentina", -43, 15, -65, 18, "trelew chubut argentina"],
+["Trenton, New Jersey, USA", 40, 13, -74, 45, "trenton new jersey usa"],
+["Tripoli, Libya", 32, 54, 13, 11, "tripoli libya"],
+["Troms&oslash;, Norway", 69, 40, 18, 56, "tromso norway"],
+["Trondheim, Norway", 63, 25, 10, 23, "trondheim norway"],
+["Trujillo, Peru, Peru", -8, 1, -79, 0, "trujillo peru peru"],
+["Tskhinvali, South Ossetia, Georgia", 42, 14, 43, 58, "tskhinvali south ossetia georgia"],
+["Tucson, Arizona, Arizona, USA", 32, 12, -110, 55, "tucson arizona arizona usa"],
+["Tulsa, Oklahoma, Oklahoma, USA", 36, 7, -95, 56, "tulsa oklahoma oklahoma usa"],
+["Tunis, Tunisia", 36, 8, 10, 17, "tunis tunisia"],
+["Turin, Italy", 45, 4, 7, 40, "turin italy"],
+["Turku, Finland", 60, 27, 22, 16, "turku finland"],
+["Udon Thani, Thailand", 17, 25, 102, 45, "udon thani thailand"],
+["Ufa, Russia", 54, 45, 55, 58, "ufa russia"],
+["Ulan Bator, Mongolia", 47, 55, 106, 55, "ulan bator mongolia"],
+["Ume&aring;, Sweden", 63, 50, 20, 15, "umea sweden"],
+["Uppsala, Sweden", 59, 51, 17, 38, "uppsala sweden"],
+["&Uuml;r&uuml;mqi, Xinjiang, China", 43, 48, 87, 35, "urumqi xinjiang china"],
+["Ushuaia, Tierra del Fuego, Argentina", -54, 48, -68, 18, "ushuaia tierra del fuego argentina"],
+["Utrecht, Netherlands", 52, 5, 5, 6, "utrecht netherlands"],
+["Vaasa, Finland", 63, 10, 22, 0, "vaasa finland"],
+["Vads&oslash;, Norway", 70, 4, 29, 44, "vadso norway"],
+["Vaduz, Liechtenstein", 47, 8, 9, 31, "vaduz liechtenstein"],
+["Valdivia, Chile, Chile", -39, 49, -73, 14, "valdivia chile chile"],
+["Valencia, Spain", 39, 29, -0, 22, "valencia spain"],
+["Valletta, Malta", 35, 54, 14, 30, "valletta malta"],
+["Valpara&iacute;so, Chile", -33, 3, -71, 37, "valparaiso chile"],
+["Vancouver, British Columbia, Canada", 49, 15, -123, 6, "vancouver british columbia canada"],
+["Vantaa, Finland", 60, 17, 25, 2, "vantaa finland"],
+["Vatican City, Vatican", 41, 54, 12, 27, "vatican city vatican"],
+["Venice, Italy", 45, 26, 12, 19, "venice italy"],
+["Veracruz, Mexico", 19, 11, -96, 8, "veracruz mexico"],
+["Victoria, British Columbia, Canada", 48, 25, -123, 22, "victoria british columbia canada"],
+["Victoria, Seychelles", -4, 37, 55, 27, "victoria seychelles"],
+["Vienna, Austria", 48, 13, 16, 22, "vienna austria"],
+["Vientiane, Laos", 17, 58, 102, 36, "vientiane laos"],
+["Vilnius, Lithuania", 54, 41, 25, 17, "vilnius lithuania"],
+["Virginia Beach, Virginia, USA", 36, 51, -75, 59, "virginia beach virginia usa"],
+["Vit&oacute;ria, Esp&iacute;rito Santo, Brazil", -20, 19, -40, 20, "vitoria espirito santo brazil"],
+["Vladivostok, Russia", 43, 8, 131, 54, "vladivostok russia"],
+["Volgograd, Russia", 48, 42, 44, 31, "volgograd russia"],
+["Voronezh, Russia", 51, 40, 39, 12, "voronezh russia"],
+["Warsaw, Poland", 52, 14, 21, 1, "warsaw poland"],
+["Washington, D.C., USA", 38, 54, -77, 2, "washington d.c. usa"],
+["Wellington, New-Zealand", -41, 17, 174, 47, "wellington new-zealand"],
+["Weno, Federated States of Micronesia", 7, 27, 151, 51, "weno federated states of micronesia"],
+["Whitehorse, Yukon, Canada", 60, 41, -135, 8, "whitehorse yukon canada"],
+["Wichita, Kansas, USA", 37, 41, -97, 20, "wichita kansas usa"],
+["Willemstad, CuraÃ§ao, Netherlands", 12, 7, -68, 56, "willemstad curacao netherlands"],
+["Windhoek, Namibia", -22, 34, 17, 5, "windhoek namibia"],
+["Winnipeg, Manitoba, Canada", 49, 54, -97, 8, "winnipeg manitoba canada"],
+["Wollongong, New South Wales, Australia", -34, 26, 150, 53, "wollongong new south wales australia"],
+["Wonsan, North Korea", 39, 9, 127, 26, "wonsan north korea"],
+["Wuhan, Hubei, China", 30, 34, 114, 16, "wuhan hubei china"],
+["Xi&apos;an, Shaanxi, China", 34, 16, 108, 54, "xian shaanxi china"],
+["Xining, Qinghai, China", 36, 38, 101, 46, "xining qinghai china"],
+["Yakutsk, Russia", 62, 2, 129, 44, "yakutsk russia"],
+["Yamoussoukro, CÃ´te d'Ivoire", 6, 49, -5, 17, "yamoussoukro cote d'ivoire"],
+["Yangon, Burma (Myanmar)", 16, 48, 96, 9, "yangon burma rangoon myanmar"],
+["Yaound&eacute;, Cameroon", 3, 52, 11, 31, "yaounde cameroon"],
+["Yaren District, Nauru", -0, 33, 166, 55, "yaren district nauru"],
+["Yarmouth, Nova Scotia, Canada", 43, 50, -66, 50, "yarmouth nova scotia canada"],
+["Yaroslavl, Russia", 57, 37, 39, 51, "yaroslavl russia"],
+["Yekaterinburg, Russia", 56, 50, 60, 35, "yekaterinburg russia"],
+["Yellowknife, Northwest Territories, Canada", 62, 27, -114, 24, "yellowknife northwest territories canada"],
+["Yellowstone National Park, Montana and Idaho, USA", 44, 36, -110, 30, "yellowstone national park montana and idaho usa"],
+["Yerevan, Armenia", 40, 11, 44, 31, "yerevan armenia"],
+["Yogyakarta, Indonesia", -7, 48, 110, 22, "yogyakarta indonesia"],
+["Yokohama, Japan", 35, 27, 139, 38, "yokohama japan"],
+["Yosemite National Park, California, USA", 37, 50, -119, 30, "yosemite national park california usa"],
+["Z&uuml;rich, Switzerland", 47, 22, 8, 33, "zurich switzerland"],
+["Zagreb, Croatia", 45, 49, 15, 59, "zagreb croatia"],
+["Zamboanga City, Philippines", 6, 54, 122, 4, "zamboanga city philippines"],
+["Zanzibar, Tanzania", -6, 10, 39, 12, "zanzibar tanzania"],
+["Zapopan, Jalisco, Mexico", 20, 46, -103, 24, "zapopan jalisco mexico"],
+["Zaragoza, Aragon, Spain", 41, 39, -0, 53, "zaragoza aragon spain"],
+["Zhengzhou, Henan, China", 34, 45, 113, 38, "zhengzhou henan china"],
+["Zion National Park, Utah, USA", 37, 18, -113, 3, "zion national park utah usa"]
+];
+
+
+
+function $(id) { 
+//	if (typeof id === 'string') {
+		return document.getElementById(id); 
+//	}
+//	return id;
+}
+
+//
+// each
+//
+
+if (![].each) {
+Array.prototype.each = function(callback) {
+	for (var i = 0, len = this.length; i < len; ++i) {
+		if (callback(this[i]) === false)
+			break;
+	}
+}
+}
+
+//
+// Copy all the properties from one object to another
+// Use to extend the prototype of a source object
+//
+
+function extend(source, destination) {
+	for (var property in source)
+		destination[property] = source[property];
+}
+
+function sign(x) { return x > 0 ? 1 : (x < 0 ? -1 : 0);}
+
+// Fast trim() function
+if (!String.trim) {
+String.prototype.trim = function() {
+    return String(this).replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+}
+}
+
+Date.prototype.getJulianDay = function() {
+	return Math.floor((this / 86400000) - (this.getTimezoneOffset()/1440) + 2440587.5);
+}
+
+
+// http://www.movable-type.co.uk/scripts/latlong.html
+
+
+/**
+ * Parses string representing degrees/minutes/seconds into numeric degrees
+ *
+ * This is very flexible on formats, allowing signed decimal degrees, or deg-min-sec optionally
+ * suffixed by compass direction (NSEW). A variety of separators are accepted (eg 3Âº 37' 09"W) 
+ * or fixed-width format without separators (eg 0033709W). Seconds and minutes may be omitted. 
+ * (Note minimal validation is done).
+ *
+ * @param   {String|Number} dmsStr: Degrees or deg/min/sec in variety of formats
+ * @returns {Number} Degrees as decimal number
+ * @throws  {TypeError} dmsStr is an object, perhaps DOM object without .value?
+ */
+function parse_DMS(dmsStr) {
+  
+  // check for signed decimal degrees without NSEW, if so return it directly
+  if (typeof dmsStr === 'number' && isFinite(dmsStr)) return Number(dmsStr);
+  
+  // strip off any sign or compass dir'n & split out separate d/m/s
+  var dms = String(dmsStr).trim().replace(/^-/,'').replace(/[NSEW]$/i,'').split(/[^0-9.,]+/);
+  if (dms[dms.length-1]=='') dms.splice(dms.length-1);  // from trailing symbol
+  
+  if (dms == '') return NaN;
+  
+  // and convert to decimal degrees...
+  switch (dms.length) {
+    case 3:  // interpret 3-part result as d/m/s
+      var deg = dms[0]/1 + dms[1]/60 + dms[2]/3600; 
+      break;
+    case 2:  // interpret 2-part result as d/m
+      var deg = dms[0]/1 + dms[1]/60; 
+      break;
+    case 1:  // just d (possibly decimal) or non-separated dddmmss
+      var deg = dms[0];
+      // check for fixed-width unseparated format eg 0033709W
+      if (/[NS]/i.test(dmsStr)) deg = '0' + deg;  // - normalise N/S to 3-digit degrees
+      if (/[0-9]{7}/.test(deg)) deg = deg.slice(0,3)/1 + deg.slice(3,5)/60 + deg.slice(5)/3600; 
+      break;
+    default:
+      return NaN;
+  }
+  if (/^-|[WS]$/i.test(dmsStr.trim())) deg = -deg; // take '-', west and south as -ve
+  return Number(deg);
+}
+
+
+function city_lat_long_to_string(lat, long) {
+	if (isNaN(lat) || isNaN(long))
+		return '';
+		
+	var city = find_closest_city(lat, long);
+
+	var result = '';
+	if (city[0] < 10)
+		result = city[1];
+	else
+		result = Math.ceil(city[0]) + " km from " + city[1];
+
+	result += ' (' + lat_long_to_string(lat, long) + ')';
+	return result;
+}
+
+function lat_long_to_string(lat, long) {
+	var result = "<strong>" + Math.abs(lat).toFixed(3) + "</strong>&deg;";
+	result += lat > 0 ? 'N' : 'S';
+	
+	result += " &ndash; ";
+
+	result += "<strong>" + Math.abs(long).toFixed(3) + "</strong>&deg;";
+	result += long > 0 ? 'E' : 'W';
+	
+	return result;
+}
+
+
+// Calculate the distance between two point
+// From: Haversine formula - R. W. Sinnott, "Virtues of the Haversine",
+// Sky and Telescope, vol 68, no 2, 1984
+
+function haversine(lat1, long1, lat2, long2) {
+  with (Math) {
+	var toRad = PI / 180;
+	var sLat = sin(toRad * (lat2 - lat1) / 2);
+	var sLon = sin(toRad * (long2 - long1) / 2);
+
+	var a = sLat * sLat + cos(lat1 * toRad) * cos(lat2 * toRad) * sLon * sLon;
+
+	var c = 2 * atan2(sqrt(a), sqrt(1 - a));
+  }
+
+  return 6378 * c;	// 6378 = radius of the Earth, in km
+}
+
+// Return the city that best match the specified name
+// Return an array of matches
+// Each entry in the array is a city record
+
+function find_city_by_name(name) {
+	name = name.toLowerCase();
+	
+	for (var i = 0; i < cities.length; ++i) {
+		if (cities[i][0].toLowerCase().indexOf(name) >= 0) {
+			return cities[i];
+		}
+	}
+	return undefined;	
+}
+
+// Return the cities that best match the specified name
+// Return an array of matches
+// Each entry in the array is a city record
+
+function match_city(name) {
+	var result = new Array();
+
+	name = name.toLowerCase();
+	
+	for (var i = 0; i < cities.length; ++i) {
+		if (cities[i][5].indexOf(name) >= 0) {
+			result.push(cities[i]);
+		}
+	}
+	
+	// Sort the results so that the items that match earlier in the string
+	// are first. That is, if a string begins with the target substring, it 
+	// will be before another result that merely contains the substring.
+	result.sort(function(a,b){ 
+		return a[5].toLowerCase().indexOf(name) - b[5].toLowerCase().indexOf(name);
+	});
+
+	return result;
+}
+
+
+//
+// Find city closest to specified lat/long
+// Return an array with the following info:
+// [0] distance to target lat/long
+// [1] City name
+// [2...n] Administrative area, Country
+
+function find_closest_city(lat, long) {
+	var result = new Array();
+	
+	if (typeof(long) == 'undefined' || typeof(lat) == 'undefined')
+		return result;
+	
+	var closest_distance = 10000;
+	var closest_city = 0;
+
+	for (var i = 0; i < cities.length; ++i) {
+		var city = cities[i];
+		var lat2 = sign(city[1]) * (Math.abs(city[1]) + city[2]/60);
+		var long2 = sign(city[3]) * (Math.abs(city[3]) + city[4]/60);
+		var dist = haversine(lat, long, lat2, long2);
+		if (dist < closest_distance) {
+			closest_distance = dist;
+			closest_city = i;
+		}
+	}
+
+	result.push(closest_distance);
+	result = result.concat(cities[closest_city][0].split(","));
+
+	return result;
+}
+
+//
+// Request current location
+// 
+
+function request_location() {
+	
+	// If the browser supports the w3c geo api
+	if(navigator.geolocation) {
+		// get the current position
+		navigator.geolocation.getCurrentPosition(
+		// if this was successful, get the latitude and longitude
+		function(position){
+			g_geolocation_available = true;
+			g_geolocation_lat = position.coords.latitude;
+			g_geolocation_long = position.coords.longitude;
+
+			if (!g_location_modified_by_user) {
+				g_lat = g_geolocation_lat;
+		    	g_long = g_geolocation_long;
+
+				var year = parseInt($('year').innerText);
+				var month = parseInt($('monthnum').innerText);
+		    	update(month, year);
+			}
+		},
+		// if there was an error
+	  function(error){
+	});
+}
+
+
+}
+
+
+//
+// Update the calendar based on the selected year/month
+// - month = 0..11
+// - year = 4 digit year
+
+function update(month, year) {
+	// Default location: San Francisco
+	var lat = typeof(g_lat) == 'undefined' ? 37.75 : g_lat;
+	var long = typeof(g_long) == 'undefined' ? -122.4 : g_long;
+
+	
+	if ($('location_data') != undefined)
+		$('location_data').innerHTML = city_lat_long_to_string(lat, long);
+
+	var today = new Date();
+
+	var result = "<table style='width:100%;height:100%;text-align:center;' border='0'>";
+	result += "<tr><th scope='col' title='Monday'>M</th><th scope='col' title='Tuesday'>T</th><th scope='col' title='Wednesday'>W</th><th scope='col' title='Thursday'>Th</th><th scope='col' title='Friday'>F</th><th scope='col' title='Saturday'>S</th><th scope='col' title='Sunday'>S</th></tr>";
+
+	
+	$('year').innerText = year.toString();
+	$('month').innerText = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][month];
+	$('monthnum').innerText = month;
+
+	var day = new Date(year, month, 1).getDay();
+	day = 2 - (day == 0 ? 7 : day);
+		
+	// Calculate number of days in the month, by letting getDate() adjust 
+	// for overflow of an invalid date (i.e. 3/32 == 4/1)
+	var daysInMonth = 32 - new Date(year, month, 32).getDate();
+	
+	while (day <= daysInMonth) {
+		result += "<tr>";
+		for (var i = 0; i < 7; i++) {
+			var cellContent = '';
+			var cellClass = '';
+
+			if (year == today.getFullYear() && month == today.getMonth() && day == today.getDate())
+				cellClass = 'today';
+
+			if (day >= 1 && day <= daysInMonth) {
+				var moon_phase = get_moon_phase(year, month, day);
+
+				if (moon_phase.length == 0)
+					cellContent += day.toString() + "<br>"; 
+				else
+					cellContent += "<img src='img/" + moon_phase +".png' width=27 height=27 align='center'><br>";
+				
+				cellContent += "<span class='day_data'>";
+				cellContent += get_sunrise(year, month + 1, day, lat, long, -(new Date(year, month, day).getTimezoneOffset()) / 60);
+				cellContent += "&nbsp;&ndash;&nbsp;"
+				cellContent += get_sunset(year, month + 1, day, lat, long, -(new Date(year, month, day).getTimezoneOffset()) / 60);
+				cellContent += "</span>";
+				
+			}
+			result += cellClass.length > 0 ? ("<td class=\"" + cellClass + "\">") : "<td>";
+			result += cellContent;
+			result += "</td>";
+			
+			day++;
+		}
+		result += "</tr>";
+	}
+	result += "</table>";
+
+	$('calendar').innerHTML = result;
+}
+
+//
+// Update the calendar to display the previous month
+//
+
+function previousmonth() {
+	var year = parseInt($('year').innerText);
+	var month = parseInt($('monthnum').innerText);
+	
+	month -= 1;
+	if (month < 0) {
+		year -= 1;
+		month = 11;
+	}
+	
+	update(month, year);
+}
+
+//
+// Update the calendar to display the next month
+//
+
+function nextmonth() {
+	var year = parseInt($('year').innerText);
+	var month = parseInt($('monthnum').innerText);
+	
+	month += 1;
+	if (month > 11) {
+		year += 1;
+		month = 0;
+	}
+	
+	update(month, year);
+}
+
+//
+// Callback activated when the location has been updated by the user
+// 
+
+function update_location(new_location) {
+	if ($('location_input') == undefined)
+		return;
+	if (new_location == undefined)
+		new_locaiton = '';
+	new_location = new_location.trim();
+	
+	if (new_location.length > 0)
+	{
+		var city = find_city_by_name(new_location);
+
+		// If we found at least one candidate
+		if (city != undefined) {
+			g_lat = sign(city[1]) * (Math.abs(city[1]) + city[2]/60);
+			g_long = sign(city[3]) * (Math.abs(city[3]) + city[4]/60);
+
+			g_location_modified_by_user = true;
+		}
+		else {
+			// No candidate found. Try to parse a lat/long
+			var dms = new_location.split(',');
+			if (dms.length != 2)
+				dms = new_location.split(';');
+			if (dms.length != 2)
+				dms = new_location.split('/');
+			if (dms.length != 2)
+				dms = new_location.split(' ');
+			if (dms.length >= 2) {
+				var new_lat = pin(parse_DMS(dms[0]), -90, 90);
+				if (!isNaN(new_lat)) {
+					var new_long = NaN;
+					for (var i = 0; i < dms.length; ++i) {
+						new_long = pin(parse_DMS(dms[i]), -180, 180);
+					}
+					if (!isNaN(g_lat) && !isNaN(g_long)) {
+						g_lat = new_lat;
+						g_long = new_long;
+						g_location_modified_by_user = true;
+					}
+				}
+			}
+		}
+	}
+		
+	var location = "<div id='location_data' onclick='edit_location();'></div>";
+
+	$('location_input').onblur = undefined;		// Detach the onblur handler, which would otherwise be invoked with the following line
+	$('location').innerHTML = location;
+
+	var year = parseInt($('year').innerText);
+	var month = parseInt($('monthnum').innerText);
+    update(month, year);
+}
+
+
+
+//
+// Callback activated when the user clicks on the location area.
+// Initiate an editing session for the location
+//
+
+function edit_location() {
+	var city = new Array();
+	
+	if (typeof(g_lat) != 'undefined' && typeof(g_long) != 'undefined')
+		city = find_closest_city(g_lat, g_long);
+	else
+		city = find_closest_city(37.75, -122.4);
+
+	var edit_field = "<input id='location_input' type='text' onfocus='this.select();' onblur='' onkeydown='return handle_key(event);' value='";
+	if (city.length > 0)
+		edit_field += city[1];
+	edit_field += "'>";
+
+	$('location').innerHTML = edit_field;
+
+	$('location_input').focus();
+}
+
+//
+// Return the first (dir > 0) or last (dir <= 0) child of this element
+//
+
+function get_element_child(el, dir) {
+	if (el.childElementCount == 0)
+		return undefined;
+
+	return dir > 0 ? el.children[0] : el.children[el.childElementCount - 1];
+}
+
+//
+// Return the next (dir > 0) or previous (dir <= 0) sibling of this element
+//
+
+function get_element_sibling(el, dir) {
+	var result = dir > 0 ? el.nextElementSibling : el.previousElementSibling;
+	
+	// If reached the end of the child list, loop around
+	if (!result)
+		result = get_element_child(el.parentElement, dir);
+
+	return result;
+}
+
+//
+// Return the next (dir > 0) or previous (dir <= 0) sibling.
+// When all the siblings have been exhausted, go look for the next cousin
+// that is a child element of a sibling of the parent of this element.
+//
+
+function get_element_cousin(el, dir) {
+	var result = dir > 0 ? el.nextElementSibling : el.previousElementSibling;
+	
+	// If reached the end of the child list, look for uncles
+	if (!result) {
+		var uncle = get_element_sibling(el.parentElement, dir);
+		while (uncle != el.parentElement && uncle.childElementCount == 0)
+			uncle = get_element_sibling(uncle, dir);
+
+		result = get_element_child(uncle, dir);
+	}
+
+	return result;
+}
+
+
+//
+// Event handler for clicks on the items in the autocomplete
+//
+
+function handle_click(evt) {
+//	alert('ping'); update_location(this.value);
+	var value = this.innerText;
+	if (value.length > 0) {
+		
+///		evt.preventDefault();
+///		evt.stopPropagation();
+		
+///		$('location_input').onblur = undefined;		// Detach the onblur handler
+		
+		var sel = $('selected_autocomplete');
+		if (sel != undefined) {
+			// Clear its name and id
+			sel.className = '';
+			sel.id = '';
+			this.className = 'selected';
+			this.id = 'selected_autocomplete';
+		};
+
+		var parenthetical = value.match(/\(([-01-9].*)\)/);
+		if (parenthetical != null && parenthetical.length > 0)
+			value = parenthetical[1];
+
+		$('location_input').value = value;
+
+		// After 200ms, update to the new location
+		setTimeout(function() { update_location(value);}, 200);
+		
+	};
+}
+
+//
+// Event handler for global key events
+//
+
+function handle_global_key(e) {
+	// Account for browser inconsistencies
+    var evt = (e) ? e : window.event;       
+	var key_code = (evt.which == undefined) ? evt.keyCode : evt.which;
+
+
+	if (key_code == 37) {
+		// ARROW LEFT
+		previousmonth();
+	     if (e)                                  // Non IE
+	        Event.stop(evt);                    // Using prototype
+	    else
+	        evt.returnValue = false;            // and stop it!
+		return false;
+	} else if (key_code == 39) {
+		// ARROW RIGHT
+		nextmonth();
+	     if (e)                                  // Non IE
+	        Event.stop(evt);                    // Using prototype
+	    else
+	        evt.returnValue = false;            // and stop it!
+		return false;
+	}
+	return true;
+}
+
+//
+// Event handler for key events in the location edit field
+//
+
+function handle_key(e) {
+	// Account for browser inconsistencies
+    var evt = (e) ? e : window.event;       
+	var key_code = (evt.which == undefined) ? evt.keyCode : evt.which;
+
+	if (key_code == 13 || key_code == 9)	{
+		// RETURN or TAB
+
+		var value = get_autocomplete_suggestion('location_input');
+		if (value.length > 0) {
+			var parenthetical = value.match(/\((.*)\)/);
+			if (parenthetical != null && parenthetical.length > 0)
+				value = parenthetical[1];
+			$('location_input').value = value;
+		} else {
+			value = $('location_input').value;
+		}
+	
+		// After 200ms, update to the new location
+		setTimeout(function() { update_location(value);}, 200);
+
+	       Event.stop(evt);                    // Using prototype
+		evt.cancelBubble = true;
+		evt.defaultPrevented = true;
+		return false;
+	} else if (key_code == 27) {
+		// ESC
+
+		// Do not update the location to a new value
+		update_location('');
+		
+		evt.cancelBubble = true;
+		evt.defaultPrevented = true;
+		return false;
+	} else if (key_code == 37 || key_code == 39) {
+	       Event.stop(evt);                    // Using prototype
+		evt.cancelBubble = true;
+		return false;
+	} else if (key_code == 38 || key_code == 40) {
+		// UP ARROW or DOWN ARROW
+		var direction = key_code == 38 ? -1 : 1;
+		
+		// Get currently selected element
+		var sel = $('selected_autocomplete');
+		if (sel != undefined) {
+			// Clear its name and id
+			sel.className = '';
+			sel.id = '';
+
+			// Determine next or previous element
+			sel = get_element_cousin(sel, direction);
+			
+			// Assign appropriate class and ID to new selection
+			if (sel) {
+				sel.className = 'selected';
+				sel.id = 'selected_autocomplete';
+			}
+///			evt.preventDefault();
+///			evt.stopPropagation();
+			evt.cancelBubble = true;
+			evt.defaultPrevented = true;
+			return false;
+		};
+	} else {
+		var value = $('location_input').value.trim();
+		var string_options = new Array();
+		
+		// If there are three or more characters...
+		if (value.length >= 3) {
+			// Generate possible options
+			var options = match_city(value);
+			if (options.length > 0) {
+				for (var i = 0; i < options.length; ++i) {
+					string_options.push(options[i][0]);
+				}
+			} else {
+				// No candidate found. Try to parse a lat/long
+				var dms = value.split(',');
+				if (dms.length != 2)
+					dms = value.split(';');
+				if (dms.length != 2)
+					dms = value.split('/');
+				if (dms.length != 2)
+					dms = value.split(' ');
+				if (dms.length >= 2) {
+					var new_lat = pin(parse_DMS(dms[0]), -90, 90);
+					if (!isNaN(new_lat)) {
+						var new_long = NaN;
+						for (var i = 0; i < dms.length; ++i) {
+							new_long = pin(parse_DMS(dms[i]), -180, 180);
+						}
+						if (!isNaN(g_lat) && !isNaN(g_long)) {
+							var option = city_lat_long_to_string(new_lat, new_long);
+							if (option.length > 0)
+								string_options.push(option);
+						}
+					}
+				}
+			}			
+		}
+
+		// Display and update the autocomplete if there are options, hide it otherwise
+		if (string_options.length > 0)
+			show_autocomplete('location_input', string_options);
+		else
+			hide_autocomplete('location_input');
+
+	}
+	
+	return true;
+}
+
+
+//
+// Display an auto-complete pop-up window
+// id: id of text input area this auto-complete is attached to
+// options: array of string values
+// 
+
+function show_autocomplete(id, options) {
+	// Create a list out of the options
+	var list = "<div style='text-align:left;padding:5px;'>Suggestions</div> <ul>";
+	
+	// Do not display more than 5 options
+	var count = Math.min(options.length, 5);
+	
+	for (var i = 0; i < count; ++i) {
+		list += i == 0 ? "<li id='selected_autocomplete' class='selected'>" : "<li>";
+		list += options[i];
+		list += '</li>';
+	}
+	list += '</ul>';
+
+	// If there are more options available, let the user know
+	if (count < options.length) {
+		list += '...and ' + (options.length - count) + ' more...';
+	}
+	
+	// If we have a current location, offer it as an option
+	if (g_geolocation_available) {
+		list += "<hr>";
+		list += "<div style='text-align:left;padding:5px;'>Current Location</div>";
+		list += "<ul><li>" + city_lat_long_to_string(g_geolocation_lat, g_geolocation_long) + "</li></ul>";
+	}
+	
+	el = $(id+'-autocomplete');
+	if (el == undefined) {
+		var src = $(id);
+		// Create the popup
+		el = document.createElement('div');
+		el.className = 'autocomplete';
+		
+		el.id = id + '-autocomplete';
+		el = $(id).parentNode.appendChild(el);
+	}
+
+	// Add the list to the popup
+	el.innerHTML = list;
+
+	// Add the click handlers for the selectable items
+	var sel = $('selected_autocomplete');
+	var el = sel;
+	do {
+		el.addEventListener('click', handle_click, true);
+		el = get_element_cousin(el, 1);
+	} while (el != sel);
+
+}
+
+//
+// Return the currently selected autocomplete suggestion, 
+// or the empty string if none
+// id: id of text input area this auto-complete is attached to
+// 
+
+function get_autocomplete_suggestion(id) {
+	var result = '';
+	var el = $(id+'-autocomplete');
+	if (el != undefined) {
+		var sel = $('selected_autocomplete');
+		if (sel != undefined) {
+			result = sel.innerText;
+		}
+	}
+
+	return result;
+}
+
+//
+// Hide the auto-complete pop-up window
+// id: id of text input area this auto-complete is attached to
+// 
+
+function hide_autocomplete(id) {
+	var el = $(id+'-autocomplete');
+	if (el != undefined)
+		el.parentNode.removeChild(el);
+}
+
+//
+// Return value in the range [0, mod)
+//
+
+function modulo(value, mod) {
+	var val = value;
+	return val > mod ? val - mod : (val < 0 ? val + mod : val);
+}
+
+function pin(value, min, max) {
+	return value > max ? max : (value < min ? min : value);
+}
+
+function get_sunrise(year, month, day, lat, long, tz) {
+	return get_sun_event(year, month, day, lat, long, tz, true);
+}
+
+
+function get_sunset(year, month, day, lat, long, tz) {
+	return get_sun_event(year, month, day, lat, long, tz, false);
+}
+
+
+//
+// Sunrise/sunset algorithm
+//
+// http://williams.best.vwh.net/sunrise_sunset_algorithm.htm
+// http://williams.best.vwh.net/sunrise_sunset_example.htm
+//
+//
+// sunrise == true to calculate the sunrise, false to calculate the sunset
+//
+
+function get_sun_event(year, month, day, latitude, longitude, tz, sunrise) {
+	var zenith = 90.83; 
+				// 90 deg 50' = official
+				// civil: 96
+				// nautical: 102
+				// astronomical: 108
+	
+	var toRad = 0.0174532925199432957692369076848861271344287188854172545609;
+	var toDeg = 57.295779513082320876798154814105170332405472466564321549160;
+	
+// 1. first calculate the day of the year
+
+	var N1 = Math.floor(275 * month / 9)
+	var N2 = Math.floor((month + 9) / 12)
+	var N3 = (1 + Math.floor((year - 4 * Math.floor(year / 4) + 2) / 3))
+	var N = N1 - (N2 * N3) + day - 30
+
+// 2. convert the longitude to hour value and calculate an approximate time
+
+	var lngHour = longitude / 15
+	
+	var t = N + (((sunrise ? 6 : 18) - lngHour) / 24)
+
+// 3. calculate the Sun's mean anomaly
+	
+	var M = t * 0.9856 - 3.289
+
+// 4. calculate the Sun's true longitude
+	
+	var L = M + (1.916 * Math.sin(toRad * M)) + (0.020 * Math.sin(2 * toRad * M)) + 282.634
+	L = modulo(L, 360);
+
+// 5a. calculate the Sun's right ascension
+	
+	var RA = toDeg * Math.atan(0.91764 * Math.tan(toRad * L))
+//	NOTE: RA potentially needs to be adjusted into the range [0,360) by adding/subtracting 360
+	RA = modulo(RA, 360)
+
+// 5b. right ascension value needs to be in the same quadrant as L
+
+	var Lquadrant  = (Math.floor( L / 90)) * 90
+	var RAquadrant = (Math.floor(RA / 90)) * 90
+	RA = RA + (Lquadrant - RAquadrant)
+
+// 5c. right ascension value needs to be converted into hours
+
+	RA = RA / 15
+
+// 6. calculate the Sun's declination
+
+	var sinDec = 0.39782 * Math.sin(toRad * L)
+	var cosDec = Math.cos(Math.asin(sinDec))
+
+// 7a. calculate the Sun's local hour angle
+	
+	var cosH = (Math.cos(toRad * zenith) - (sinDec * Math.sin(toRad * latitude))) / (cosDec * Math.cos(toRad * latitude))
+	
+	if (cosH >  1) 
+//	  the sun never rises on this location (on the specified date)
+		return "--:--";
+	if (cosH < -1)
+//	  the sun never sets on this location (on the specified date)
+		return "--:--";
+
+// 7b. finish calculating H and convert into hours
+	
+	var H = sunrise ? 360 - toDeg * Math.acos(cosH) : toDeg * Math.acos(cosH);
+	
+	H = H / 15;
+
+// 8. calculate local mean time of rising/setting
+	
+	var T = H + RA - t * 0.06571 - 6.622
+
+// 9. adjust back to UTC
+	
+	var UT = T - lngHour
+
+// 10. convert UT value to local time zone of latitude/longitude
+	
+	var localT = modulo(UT + tz, 24);
+	
+	var mins = Math.floor(60 * (localT - Math.floor(localT)));
+	return Math.floor(localT) + ":" + (mins < 10 ? "0" + mins : mins);
+}
+
+
+
+
+
+// Adapted from Numerical Recipes in Fortran 77 - The Art of Scientific Computing
+function get_moon_phase(year, month, day)
+{
+	var toRad = Math.PI / 180;
+
+	var n = Math.floor(12.37 * (year - 1900 + ((month - 0.5)/12.0)));
+	var t = n / 1236.85;
+	var t2 = t * t;
+	var as = (359.2242 + 29.105356 * n) * toRad;
+	var am = (306.0253 + 385.816918 * n + 0.010730 * t2) * toRad;
+	var xtra = 0.75933 + 1.53058868 * n + ((1.178e-4) - (1.55e-7) * t) * t2;
+	xtra += (0.1734 - 3.93e-4 * t) * Math.sin(as) - 0.4068 * Math.sin(as * am);
+	var j1 = new Date(year, month, day, 6, 0).getJulianDay();
+	var jd = (2415020 + 28 * n) + (xtra > 0.0 ? Math.floor(xtra) :  Math.ceil(xtra - 1.0));
+	var result = (j1 - jd + 30) % 30;
+
+	if (result == 29)
+		return "new";
+	else if (result == 7)
+		return "last";
+	else if (result == 14)
+		return "full";
+	else if (result == 21)
+		return "first";
+	else
+		return "";
+}
+
+document.onkeydown = function(e) {handleKeys(e)}
+
+function handleKeys(e) {
+    var char;
+    var evt = (e) ? e : window.event;       //IE reports window.event not arg
+    if (evt.type == "keydown") {
+        char = evt.keycode;
+        if (char < 16 ||                    // non printables
+            (char > 16 && char < 32) ||     // avoid shift
+            (char > 32 && char < 41) ||     // navigation keys
+            char == 46) {                   // Delete Key (Add to these if you need)
+            alert(char);            // function to handle non Characters
+        };
+    }
+    
+     if (e)                                  // Non IE
+        Event.stop(evt);                    // Using prototype
+    else if (evt.keyCode == 8)              // Catch IE backspace
+        evt.returnValue = false;            // and stop it!
+}
+
+
+//]]></script>
+
+
+	</head>
+	<body onload="request_location(); var today=new Date(); update(today.getMonth(), today.getFullYear()); document.onkeydown=handle_global_key; setTimeout(function() { window.scrollTo(0, 1) }, 100); ">
+
+<div id="almanac">
+	<div id="year" >2011</div>
+
+	<div style="width:500px;height:35px;"><button type="button" onclick="previousmonth();" >&#171;</button><span id="monthnum" style="display:none">3</span><span id="month" >March</span><button type="button" onclick="nextmonth();" style="float:right;">&#187;</button></div>
+
+	<div id="calendar" style="width:500px; height:430px;"></div>
+	
+	<div id="location"><div id="location_data" onclick="edit_location();"></div></div>
+</div>
+
+</body>
+</html>
